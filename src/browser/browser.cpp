@@ -21,29 +21,28 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "browser-app.hpp"
 
+/* first arugment is full path to the binary
+ * second is shared memory id */
 int main(int argc, char* argv[])
 {
-	// shutdown if parent process dies
+	/* shutdown if parent process dies */
 	prctl(PR_SET_PDEATHSIG, SIGTERM);
 
-	char dir[2048];
-	strncpy(dir, argv[0], 2048);
-	dir[strlen(dir)-strlen("/bin/64bit/browser")] = 0;
-	char resources_dir[2048];
-	char locales_dir[2048];
-	snprintf(resources_dir, 2048, "%s/data/cef", dir);
-	snprintf(locales_dir, 2048, "%s/locales", resources_dir);
-	char subprocess_path[2048];
-	snprintf(subprocess_path, 2048, "%s-subprocess", argv[0]);
+	/* different path settings for cef */
+	std::string dir(argv[0]);
+	dir.resize(dir.length() - strlen("/bin/64bit/browser"));
+	std::string resources_dir = dir + "/data/cef";
+	std::string locales_dir = resources_dir + "/locales";
+	std::string subprocess_path = std::string(argv[0]) + "-subprocess";
 
 	CefMainArgs main_args(argc, argv);
 	CefRefPtr<BrowserApp> app(new BrowserApp(argv[1]));
 
 	CefSettings settings;
-	CefString(&settings.browser_subprocess_path).FromASCII(subprocess_path);
-	CefString(&settings.resources_dir_path).FromASCII(resources_dir);
-	CefString(&settings.locales_dir_path).FromASCII(locales_dir);
-	CefString(&settings.cache_path).FromASCII(dir);
+	CefString(&settings.browser_subprocess_path).FromString(subprocess_path);
+	CefString(&settings.resources_dir_path).FromString(resources_dir);
+	CefString(&settings.locales_dir_path).FromString(locales_dir);
+	CefString(&settings.cache_path).FromString(dir);
 	settings.no_sandbox = true;
 	settings.windowless_rendering_enabled = true;
 

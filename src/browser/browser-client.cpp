@@ -33,6 +33,7 @@ bool BrowserClient::GetViewRect(CefRefPtr<CefBrowser> browser, CefRect &rect)
 void BrowserClient::OnPaint(CefRefPtr<CefBrowser> browser, CefRenderHandler::PaintElementType type,
 	const CefRenderHandler::RectList &dirtyRects, const void *buffer, int vwidth, int vheight)
 {
+	/* don't draw popups for now */
 	if (type == PET_VIEW) {
 		pthread_mutex_lock(&data->mutex);
 		size_t len = std::min(vwidth * vheight * 4, int(data->width * data->height * 4));

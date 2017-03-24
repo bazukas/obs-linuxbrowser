@@ -27,11 +27,9 @@ public:
 	BrowserApp(char *shm_name);
 	~BrowserApp();
 
-	// CefApp methods:
 	virtual CefRefPtr<CefBrowserProcessHandler> GetBrowserProcessHandler()
 		OVERRIDE { return this; }
 
-	// CefBrowserProcessHandler methods:
 	virtual void OnContextInitialized() OVERRIDE;
 
 	int GetQueueId() { return qid; };
@@ -54,6 +52,5 @@ private:
 	int qid;
 	struct shared_data *data;
 
-	// Include the default reference counting implementation.
 	IMPLEMENT_REFCOUNTING(BrowserApp);
 };

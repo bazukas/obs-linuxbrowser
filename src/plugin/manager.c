@@ -36,32 +36,47 @@ char *get_shm_name(int uid)
 	return shm_name;
 }
 
+/* mostly building strings for arguments and env variables for
+ * browser process */
 static void spawn_renderer(browser_manager_t *manager)
 {
-	char renderer[512];
-	char path[512];
-	char display[512];
-	char flash_path[1024];
-	char flash_version[512];
-	strncpy(path, "LD_LIBRARY_PATH=", 512);
-	char *s;
-	const char *file = obs_get_module_binary_path(obs_current_module());
-	strncpy(renderer, file, 512);
-	s = strrchr(renderer, '/');
-	if (s)
-		*(s+1) = '\0';
-	strncat(path, renderer, 512-strlen(path)-1);
-	strncat(renderer, "browser", 512-strlen(renderer)-1);
-	snprintf(display, 512, "DISPLAY=%s", getenv("DISPLAY"));
+	char *bin_dir = bstrdup(obs_get_module_binary_path(obs_current_module()));
+	char *s = strrchr(bin_dir, '/');
+	if (s) *(s+1) = '\0';
 
-	snprintf(flash_path, 1024, "--ppapi-flash-path=%s", manager->flash_path);
-	snprintf(flash_version, 512, "--ppapi-flash-version=%s", manager->flash_version);
+	size_t flash_path_size = strlen("--ppapi-flash-path=") + strlen(manager->flash_path) + 1;
+	char *flash_path = bzalloc(flash_path_size);
+	snprintf(flash_path, flash_path_size, "--ppapi-flash-path=%s", manager->flash_path);
+
+	size_t flash_version_size = strlen("--ppapi-flash-version=") + strlen(manager->flash_version) + 1;
+	char *flash_version = bzalloc(flash_version_size);
+	snprintf(flash_version, flash_version_size, "--ppapi-flash-version=%s", manager->flash_version);
+
+	size_t renderer_size = strlen(bin_dir) + strlen("browser") + 1;
+	char *renderer = bzalloc(renderer_size);
+	snprintf(renderer, renderer_size, "%sbrowser", bin_dir);
+
+	size_t path_size = strlen("LD_LIBRARY_PATH=") + strlen(bin_dir)+1;
+	char *path = bzalloc(path_size);
+	snprintf(path, path_size, "LD_LIBRARY_PATH=%s", bin_dir);
+
+	size_t display_size = strlen("DISPLAY=") + strlen(getenv("DISPLAY")) + 1;
+	char *display = bzalloc(display_size);
+	snprintf(display, display_size, "DISPLAY=%s", getenv("DISPLAY"));
+
 	char *argv[] = { renderer, manager->shmname, flash_path, flash_version, NULL };
 	char *envp[] = { path, display, NULL };
 
 	manager->pid = fork();
 	if (manager->pid == 0)
 		execve(renderer, argv, envp);
+
+	bfree(bin_dir);
+	bfree(flash_path);
+	bfree(flash_version);
+	bfree(renderer);
+	bfree(path);
+	bfree(display);
 }
 
 static void kill_renderer(browser_manager_t *manager)
@@ -72,6 +87,7 @@ static void kill_renderer(browser_manager_t *manager)
 	}
 }
 
+/* setting up shared data for the browser process */
 browser_manager_t *create_browser_manager(uint32_t width, uint32_t height, int fps,
 			const char *flash_path, const char *flash_version)
 {

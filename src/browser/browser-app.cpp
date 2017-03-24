@@ -36,6 +36,7 @@ BrowserApp::~BrowserApp()
 		free(shm_name);
 }
 
+/* open shared memory and read initial data */
 void BrowserApp::InitSharedData()
 {
 	fd = shm_open(shm_name, O_RDWR, S_IRUSR | S_IWUSR);
@@ -74,6 +75,7 @@ void BrowserApp::UninitSharedData()
 	}
 }
 
+/* message receiver thread */
 static void *MessageThread(void *vptr)
 {
 	BrowserApp *ba = (BrowserApp *) vptr;
@@ -110,17 +112,11 @@ void BrowserApp::SizeChanged()
 	width = data->width;
 	height = data->height;
 
-	data = (struct shared_data *) mmap(NULL, sizeof(struct shared_data),
-			PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
-	if (data == MAP_FAILED) {
-		printf("Browser: data mapping failed\n");
-		return;
-	}
-
 	browser->GetHost()->WasResized();
 	pthread_mutex_unlock(&data->mutex);
 }
 
+/* browser instance created in this callback */
 void BrowserApp::OnContextInitialized()
 {
 	if (!shm_name)

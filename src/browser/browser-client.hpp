@@ -25,11 +25,9 @@ class BrowserClient : public CefClient,
 public:
 	BrowserClient(struct shared_data *data);
 
-	// CefClient methods:
 	virtual CefRefPtr<CefRenderHandler> GetRenderHandler()
 		OVERRIDE { return this; }
 
-	// CefRenderHandler methods:
 	virtual bool GetViewRect(CefRefPtr<CefBrowser> browser, CefRect &rect) OVERRIDE;
 	virtual void OnPaint(CefRefPtr<CefBrowser> browser, CefRenderHandler::PaintElementType type,
 			const CefRenderHandler::RectList &dirtyRects, const void *buffer,
@@ -37,6 +35,5 @@ public:
 private:
 	struct shared_data *data;
 
-	// Include the default reference counting implementation.
 	IMPLEMENT_REFCOUNTING(BrowserClient);
 };

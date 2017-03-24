@@ -45,6 +45,8 @@ static const char* browser_get_name(void *unused)
 	return obs_module_text("LinuxBrowser");
 }
 
+/* update stored parameters, see if they have changed and call
+ * browser_manager methods based on that */
 static void browser_update(void *vptr, obs_data_t *settings)
 {
 	struct browser_data *data = vptr;
@@ -70,6 +72,7 @@ static void browser_update(void *vptr, obs_data_t *settings)
 		data->manager = create_browser_manager(data->width, data->height,
 			data->fps, flash_path, flash_version);
 
+	/* comparing and saving c-strings is tedious */
 	if (!data->url || strcmp(url, data->url) != 0) {
 		if (data->url)
 			bfree(data->url);
@@ -95,6 +98,7 @@ static void browser_update(void *vptr, obs_data_t *settings)
 		browser_manager_set_flash(data->manager, data->flash_path, data->flash_version);
 	}
 
+	/* need to recreate texture if size changed */
 	pthread_mutex_lock(&data->textureLock);
 	obs_enter_graphics();
 	if (resize || !data->activeTexture) {
