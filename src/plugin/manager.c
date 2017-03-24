@@ -232,3 +232,82 @@ void browser_manager_set_flash(browser_manager_t *manager, const char *flash_pat
 		bfree(manager->flash_version);
 	manager->flash_version = bstrdup(flash_version);
 }
+
+void browser_manager_send_mouse_click(browser_manager_t *manager, int32_t x, int32_t y,
+		uint32_t modifiers, int32_t button_type, bool mouse_up, uint32_t click_count)
+{
+	if (manager->qid == -1)
+		return;
+
+	struct mouse_click_message buf;
+	buf.type = MESSAGE_TYPE_MOUSE_CLICK;
+	buf.x = x;
+	buf.y = y;
+	buf.modifiers = modifiers;
+	buf.button_type = button_type;
+	buf.mouse_up = mouse_up;
+	buf.click_count = click_count;
+
+	msgsnd(manager->qid, &buf, sizeof(struct mouse_click_message), 0);
+}
+
+void browser_manager_send_mouse_move(browser_manager_t *manager, int32_t x, int32_t y,
+		uint32_t modifiers, bool mouse_leave)
+{
+	if (manager->qid == -1)
+		return;
+
+	struct mouse_move_message buf;
+	buf.type = MESSAGE_TYPE_MOUSE_MOVE;
+	buf.x = x;
+	buf.y = y;
+	buf.modifiers = modifiers;
+	buf.mouse_leave = mouse_leave;
+
+	msgsnd(manager->qid, &buf, sizeof(struct mouse_move_message), 0);
+}
+
+void browser_manager_send_mouse_wheel(browser_manager_t *manager, int32_t x, int32_t y,
+		uint32_t modifiers, int x_delta, int y_delta)
+{
+	if (manager->qid == -1)
+		return;
+
+	struct mouse_wheel_message buf;
+	buf.type = MESSAGE_TYPE_MOUSE_WHEEL;
+	buf.x = x;
+	buf.y = y;
+	buf.modifiers = modifiers;
+	buf.x_delta = x_delta;
+	buf.y_delta = y_delta;
+
+	msgsnd(manager->qid, &buf, sizeof(struct mouse_wheel_message), 0);
+}
+
+void browser_manager_send_focus(browser_manager_t *manager, bool focus)
+{
+	if (manager->qid == -1)
+		return;
+
+	struct focus_message buf;
+	buf.type = MESSAGE_TYPE_FOCUS;
+	buf.focus = focus;
+
+	msgsnd(manager->qid, &buf, sizeof(struct focus_message), 0);
+}
+
+void browser_manager_send_key(browser_manager_t *manager, bool key_up, uint32_t native_vkey,
+		uint32_t modifiers, char chr)
+{
+	if (manager->qid == -1)
+		return;
+
+	struct key_message buf;
+	buf.type = MESSAGE_TYPE_KEY;
+	buf.key_up = key_up;
+	buf.native_vkey = native_vkey;
+	buf.modifiers = modifiers;
+	buf.chr = chr;
+
+	msgsnd(manager->qid, &buf, sizeof(struct key_message), 0);
+}

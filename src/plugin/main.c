@@ -299,12 +299,55 @@ static void browser_render(void *vptr, gs_effect_t *effect)
 	pthread_mutex_unlock(&data->textureLock);
 }
 
+
+static void browser_mouse_click(void *vptr, const struct obs_mouse_event *event,
+		int32_t type, bool mouse_up, uint32_t click_count)
+{
+	struct browser_data *data = vptr;
+	browser_manager_send_mouse_click(data->manager, event->x, event->y, event->modifiers,
+			type, mouse_up, click_count);
+}
+
+static void browser_mouse_move(void *vptr, const struct obs_mouse_event *event,
+		bool mouse_leave)
+{
+	struct browser_data *data = vptr;
+	browser_manager_send_mouse_move(data->manager, event->x, event->y, event->modifiers,
+			mouse_leave);
+}
+
+static void browser_mouse_wheel(void *vptr, const struct obs_mouse_event *event,
+		int x_delta, int y_delta)
+{
+	struct browser_data *data = vptr;
+	browser_manager_send_mouse_wheel(data->manager, event->x, event->y, event->modifiers,
+			x_delta, y_delta);
+}
+
+static void browser_focus(void *vptr, bool focus)
+{
+	struct browser_data *data = vptr;
+	browser_manager_send_focus(data->manager, focus);
+}
+
+static void browser_key_click(void *vptr, const struct obs_key_event *event, bool key_up)
+{
+	struct browser_data *data = vptr;
+	char chr = 0;
+	if (event->text)
+		chr = event->text[0];
+	blog(LOG_INFO, "Key: %s %d %d", event->text, event->native_vkey, event->native_scancode);
+
+	browser_manager_send_key(data->manager, key_up, event->native_vkey,
+			event->modifiers, chr);
+}
+
 bool obs_module_load(void)
 {
 	struct obs_source_info info = {};
 	info.id             = "linuxbrowser-source";
 	info.type           = OBS_SOURCE_TYPE_INPUT;
-	info.output_flags   = OBS_SOURCE_VIDEO;
+	info.output_flags   = OBS_SOURCE_VIDEO | OBS_SOURCE_INTERACTION;
 
 	info.get_name       = browser_get_name;
 	info.create         = browser_create;
@@ -316,6 +359,12 @@ bool obs_module_load(void)
 	info.get_defaults   = browser_get_defaults;
 	info.video_tick     = browser_tick;
 	info.video_render   = browser_render;
+
+	info.mouse_click    = browser_mouse_click;
+	info.mouse_move     = browser_mouse_move;
+	info.mouse_wheel    = browser_mouse_wheel;
+	info.focus          = browser_focus;
+	info.key_click      = browser_key_click;
 
 	obs_register_source(&info);
 	return true;

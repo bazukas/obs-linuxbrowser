@@ -38,13 +38,58 @@ struct shared_data {
 #define MESSAGE_TYPE_SIZE 2
 #define MESSAGE_TYPE_RELOAD 3
 #define MESSAGE_TYPE_CSS 4
+#define MESSAGE_TYPE_MOUSE_CLICK 5
+#define MESSAGE_TYPE_MOUSE_MOVE 6
+#define MESSAGE_TYPE_MOUSE_WHEEL 7
+#define MESSAGE_TYPE_FOCUS 8
+#define MESSAGE_TYPE_KEY 9
 
 struct generic_message {
 	long type;
-	void *data;
+	uint8_t data[MAX_MESSAGE_SIZE];
 };
 
 struct text_message {
 	long type;
 	char text[MAX_MESSAGE_SIZE];
+};
+
+struct mouse_click_message {
+	long type;
+	int32_t x;
+	int32_t y;
+	uint32_t modifiers;
+	int32_t button_type;
+	bool mouse_up;
+	uint32_t click_count;
+};
+
+struct mouse_move_message {
+	long type;
+	int32_t x;
+	int32_t y;
+	uint32_t modifiers;
+	bool mouse_leave;
+};
+
+struct mouse_wheel_message {
+	long type;
+	int32_t x;
+	int32_t y;
+	uint32_t modifiers;
+	int x_delta;
+	int y_delta;
+};
+
+struct focus_message {
+	long type;
+	bool focus;
+};
+
+struct key_message {
+	long type;
+	bool key_up;
+	uint32_t native_vkey;
+	uint32_t modifiers;
+	char chr;
 };

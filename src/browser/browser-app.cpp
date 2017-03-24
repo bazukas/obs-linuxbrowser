@@ -84,15 +84,23 @@ static void *MessageThread(void *vptr)
 	size_t max_buf_size = MAX_MESSAGE_SIZE;
 	ssize_t received;
 	CefString url;
+	CefMouseEvent e;
+	CefKeyEvent ke;
 
-	struct text_message msg;
+	struct generic_message msg;
+	struct text_message *tmsg = (struct text_message *) &msg;
+	struct mouse_click_message *cmsg = (struct mouse_click_message *) &msg;
+	struct mouse_move_message *mmsg = (struct mouse_move_message *) &msg;
+	struct mouse_wheel_message *wmsg = (struct mouse_wheel_message *) &msg;
+	struct focus_message *fmsg = (struct focus_message *) &msg;
+	struct key_message *kmsg = (struct key_message *) &msg;
 
 	while (true) {
 		received = msgrcv(ba->GetQueueId(), &msg, max_buf_size, 0, MSG_NOERROR);
 		if (received != -1) {
 			switch (msg.type) {
 			case MESSAGE_TYPE_URL:
-				url.FromASCII(msg.text);
+				url.FromASCII(tmsg->text);
 				ba->GetBrowser()->GetMainFrame()->LoadURL(url);
 				break;
 			case MESSAGE_TYPE_SIZE:
@@ -102,10 +110,46 @@ static void *MessageThread(void *vptr)
 				ba->GetBrowser()->ReloadIgnoreCache();
 				break;
 			case MESSAGE_TYPE_CSS:
-				ba->CssChanged(msg.text);
+				ba->CssChanged(tmsg->text);
+				break;
+			case MESSAGE_TYPE_MOUSE_CLICK:
+				e.modifiers = cmsg->modifiers;
+				e.x = cmsg->x;
+				e.y = cmsg->y;
+				ba->GetBrowser()->GetHost()->SendMouseClickEvent(e,
+					(CefBrowserHost::MouseButtonType) cmsg->button_type,
+					cmsg->mouse_up, cmsg->click_count);
+				break;
+			case MESSAGE_TYPE_MOUSE_MOVE:
+				e.modifiers = mmsg->modifiers;
+				e.x = mmsg->x;
+				e.y = mmsg->y;
+				ba->GetBrowser()->GetHost()->SendMouseMoveEvent(e, mmsg->mouse_leave);
+				break;
+			case MESSAGE_TYPE_MOUSE_WHEEL:
+				e.modifiers = mmsg->modifiers;
+				e.x = mmsg->x;
+				e.y = mmsg->y;
+				ba->GetBrowser()->GetHost()->SendMouseWheelEvent(e,
+					wmsg->x_delta, wmsg->y_delta);
+				break;
+			case MESSAGE_TYPE_FOCUS:
+				ba->GetBrowser()->GetHost()->SendFocusEvent(fmsg->focus);
+				break;
+			case MESSAGE_TYPE_KEY:
+				/* I have no idea what is happening */
+				ke.windows_key_code = kmsg->native_vkey;
+				ke.native_key_code = kmsg->native_vkey;
+				ke.modifiers = kmsg->modifiers;
+				ke.type = kmsg->key_up ? KEYEVENT_KEYUP : KEYEVENT_RAWKEYDOWN;
+				if (kmsg->chr != 0) {
+					ke.character = kmsg->chr;
+					if (!kmsg->key_up)
+						ke.type = KEYEVENT_CHAR;
+				}
+				ba->GetBrowser()->GetHost()->SendKeyEvent(ke);
 				break;
 			}
-			usleep(10000);
 		}
 	}
 }

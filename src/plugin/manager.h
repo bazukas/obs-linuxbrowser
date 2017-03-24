@@ -48,3 +48,13 @@ void browser_manager_restart_browser(browser_manager_t *manager);
 
 void browser_manager_set_flash(browser_manager_t *manager,
 		const char *flash_path, const char *flash_version);
+
+void browser_manager_send_mouse_click(browser_manager_t *manager, int32_t x, int32_t y,
+		uint32_t modifiers, int32_t button_type, bool mouse_up, uint32_t click_count);
+void browser_manager_send_mouse_move(browser_manager_t *manager, int32_t x, int32_t y,
+		uint32_t modifiers, bool mouse_leave);
+void browser_manager_send_mouse_wheel(browser_manager_t *manager, int32_t x, int32_t y,
+		uint32_t modifiers, int x_delta, int y_delta);
+void browser_manager_send_focus(browser_manager_t *manager, bool focus);
+void browser_manager_send_key(browser_manager_t *manager, bool key_up, uint32_t native_vkey,
+		uint32_t modifiers, char chr);
