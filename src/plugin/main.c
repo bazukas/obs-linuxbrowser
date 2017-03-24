@@ -37,6 +37,8 @@ struct browser_data {
 	gs_texture_t *activeTexture;
 	pthread_mutex_t textureLock;
 	browser_manager_t *manager;
+
+	obs_hotkey_id reload_page_key;
 };
 
 static const char* browser_get_name(void *unused)
@@ -112,6 +114,16 @@ static void browser_update(void *vptr, obs_data_t *settings)
 	pthread_mutex_unlock(&data->textureLock);
 }
 
+static void reload_hotkey_pressed(void *vptr, obs_hotkey_id id, obs_hotkey_t *key, bool pressed)
+{
+	UNUSED_PARAMETER(id);
+	UNUSED_PARAMETER(key);
+	UNUSED_PARAMETER(pressed);
+
+	struct browser_data *data = vptr;
+	browser_manager_reload_page(data->manager);
+}
+
 static void *browser_create(obs_data_t *settings, obs_source_t *source)
 {
 	struct browser_data *data = bzalloc(sizeof(struct browser_data));
@@ -119,6 +131,9 @@ static void *browser_create(obs_data_t *settings, obs_source_t *source)
 	pthread_mutex_init(&data->textureLock, NULL);
 
 	browser_update(data, settings);
+
+	data->reload_page_key = obs_hotkey_register_source(source, "linuxbrowser.reloadpage",
+			obs_module_text("ReloadPage"), reload_hotkey_pressed, data);
 	return data;
 }
 
@@ -138,6 +153,8 @@ static void browser_destroy(void *vptr)
 
 	if (data->manager)
 		destroy_browser_manager(data->manager);
+
+	obs_hotkey_unregister(data->reload_page_key);
 
 	if (data->url)
 		bfree(data->url);
