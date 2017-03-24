@@ -35,8 +35,8 @@ int main(int argc, char* argv[])
 	std::string locales_dir = resources_dir + "/locales";
 	std::string subprocess_path = std::string(argv[0]) + "-subprocess";
 
-	CefMainArgs main_args(argc, argv);
 	CefRefPtr<BrowserApp> app(new BrowserApp(argv[1]));
+	CefMainArgs main_args(argc, argv);
 
 	CefSettings settings;
 	CefString(&settings.browser_subprocess_path).FromString(subprocess_path);

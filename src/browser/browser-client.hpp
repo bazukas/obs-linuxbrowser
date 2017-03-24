@@ -21,19 +21,28 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "shared.h"
 
 class BrowserClient : public CefClient,
-                      public CefRenderHandler {
+                      public CefRenderHandler,
+		      public CefLoadHandler {
 public:
-	BrowserClient(struct shared_data *data);
+	BrowserClient(struct shared_data *data, std::string css);
 
 	virtual CefRefPtr<CefRenderHandler> GetRenderHandler()
+		OVERRIDE { return this; }
+	virtual CefRefPtr<CefLoadHandler> GetLoadHandler()
 		OVERRIDE { return this; }
 
 	virtual bool GetViewRect(CefRefPtr<CefBrowser> browser, CefRect &rect) OVERRIDE;
 	virtual void OnPaint(CefRefPtr<CefBrowser> browser, CefRenderHandler::PaintElementType type,
 			const CefRenderHandler::RectList &dirtyRects, const void *buffer,
 			int width, int height) OVERRIDE;
+
+	virtual void OnLoadEnd(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame,
+			int httpStatusCode) OVERRIDE;
+
+	void ChangeCss(std::string css) { this->css = css; };
 private:
 	struct shared_data *data;
+	std::string css;
 
 	IMPLEMENT_REFCOUNTING(BrowserClient);
 };

@@ -19,11 +19,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <sys/msg.h>
 #include <unistd.h>
 
+#include <fstream>
+
 #include "browser-app.hpp"
 
 BrowserApp::BrowserApp(char *shmname)
 {
-	if (shmname != NULL) {
+	if (shmname != NULL && strncmp(shmname, SHM_NAME, strlen(SHM_NAME)) == 0) {
 		shm_name = strdup(shmname);
 		InitSharedData();
 	}
@@ -83,22 +85,24 @@ static void *MessageThread(void *vptr)
 	ssize_t received;
 	CefString url;
 
-	struct url_message msg;
+	struct text_message msg;
 
 	while (true) {
 		received = msgrcv(ba->GetQueueId(), &msg, max_buf_size, 0, MSG_NOERROR);
 		if (received != -1) {
 			switch (msg.type) {
 			case MESSAGE_TYPE_URL:
-				url.FromASCII(msg.url);
+				url.FromASCII(msg.text);
 				ba->GetBrowser()->GetMainFrame()->LoadURL(url);
 				break;
 			case MESSAGE_TYPE_SIZE:
 				ba->SizeChanged();
 				break;
 			case MESSAGE_TYPE_RELOAD:
-				ba->SizeChanged();
 				ba->GetBrowser()->ReloadIgnoreCache();
+				break;
+			case MESSAGE_TYPE_CSS:
+				ba->CssChanged(msg.text);
 				break;
 			}
 			usleep(10000);
@@ -116,6 +120,21 @@ void BrowserApp::SizeChanged()
 	pthread_mutex_unlock(&data->mutex);
 }
 
+void BrowserApp::CssChanged(const char *css_file)
+{
+	/* read file into string */
+	std::ifstream t(css_file, std::ifstream::in);
+	if (t.good()) {
+		std::stringstream buffer;
+		buffer << t.rdbuf();
+		css = buffer.str();
+	} else {
+		css = "";
+	}
+
+	client->ChangeCss(css);
+}
+
 /* browser instance created in this callback */
 void BrowserApp::OnContextInitialized()
 {
@@ -131,7 +150,7 @@ void BrowserApp::OnContextInitialized()
 	CefBrowserSettings settings;
 	settings.windowless_frame_rate = fps;
 
-	CefRefPtr<BrowserClient> client(new BrowserClient(data));
+	CefRefPtr<BrowserClient> client(new BrowserClient(data, css));
 	this->client = client;
 
 	browser = CefBrowserHost::CreateBrowserSync(info, client.get(), "http://google.com", settings, NULL);

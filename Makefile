@@ -27,7 +27,7 @@ PLUGIN_OBJ = build/plugin/main.o build/plugin/manager.o
 
 BROWSER = build/browser/browser
 BROWSER_SUB = build/browser/browser-subprocess
-BROWSER_SHARED_OBJ = build/browser/browser-app.o build/browser/browser-client.o $(CEF_STATIC)
+BROWSER_SHARED_OBJ = build/browser/browser-app.o build/browser/browser-client.o build/browser/base64.o $(CEF_STATIC)
 BROWSER_OBJ = build/browser/browser.o $(BROWSER_SHARED_OBJ)
 BROWSER_SUB_OBJ = build/browser/browser-subprocess.o $(BROWSER_SHARED_OBJ)
 

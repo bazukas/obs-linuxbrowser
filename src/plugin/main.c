@@ -31,6 +31,7 @@ struct browser_data {
 	uint32_t fps;
 	char *flash_path;
 	char *flash_version;
+	char *css_file;
 
 	/* internal data */
 	obs_source_t *source;
@@ -69,6 +70,7 @@ static void browser_update(void *vptr, obs_data_t *settings)
 
 	const char *flash_path = obs_data_get_string(settings, "flash_path");
 	const char *flash_version = obs_data_get_string(settings, "flash_version");
+	const char *css_file = obs_data_get_string(settings, "css_file");
 
 	if (!data->manager)
 		data->manager = create_browser_manager(data->width, data->height,
@@ -98,6 +100,12 @@ static void browser_update(void *vptr, obs_data_t *settings)
 			bfree(data->flash_version);
 		data->flash_version = bstrdup(flash_version);
 		browser_manager_set_flash(data->manager, data->flash_path, data->flash_version);
+	}
+	if (!data->css_file || strcmp(css_file, data->css_file) != 0) {
+		if (data->css_file)
+			bfree(data->css_file);
+		data->css_file = bstrdup(css_file);
+		browser_manager_change_css_file(data->manager, data->css_file);
 	}
 
 	/* need to recreate texture if size changed */
@@ -162,6 +170,8 @@ static void browser_destroy(void *vptr)
 		bfree(data->flash_path);
 	if (data->flash_version)
 		bfree(data->flash_version);
+	if (data->css_file)
+		bfree(data->css_file);
 	bfree(data);
 }
 
@@ -229,6 +239,8 @@ static obs_properties_t *browser_get_properties(void *vptr)
 
 	obs_properties_add_button(props, "reload", obs_module_text("ReloadPage"), reload_button_clicked);
 
+	obs_properties_add_path(props, "css_file", obs_module_text("CustomCSS"),
+			OBS_PATH_FILE, "*.css", NULL);
 
 	obs_properties_add_path(props, "flash_path", obs_module_text("FlashPath"),
 			OBS_PATH_FILE, "*.so", NULL);

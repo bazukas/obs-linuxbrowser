@@ -17,6 +17,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #pragma once
 
+#define SHM_NAME "/obslinuxbrowser"
+#define SHM_MAX 50
+
 #define MAX_BROWSER_WIDTH 4096
 #define MAX_BROWSER_HEIGHT 4096
 #define MAX_DATA_SIZE MAX_BROWSER_WIDTH * MAX_BROWSER_HEIGHT * 4
@@ -34,13 +37,14 @@ struct shared_data {
 #define MESSAGE_TYPE_URL 1
 #define MESSAGE_TYPE_SIZE 2
 #define MESSAGE_TYPE_RELOAD 3
+#define MESSAGE_TYPE_CSS 4
 
 struct generic_message {
 	long type;
 	void *data;
 };
 
-struct url_message {
+struct text_message {
 	long type;
-	char url[MAX_MESSAGE_SIZE];
+	char text[MAX_MESSAGE_SIZE];
 };

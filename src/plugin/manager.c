@@ -26,9 +26,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "manager.h"
 
-#define SHM_NAME "/obslinuxbrowser"
-#define SHM_MAX 50
-
 char *get_shm_name(int uid)
 {
 	char *shm_name = bzalloc(SHM_MAX);
@@ -172,11 +169,23 @@ void browser_manager_change_url(browser_manager_t *manager, const char *url)
 	if (manager->qid == -1)
 		return;
 
-	struct url_message buf;
+	struct text_message buf;
 	buf.type = MESSAGE_TYPE_URL;
-	strncpy(buf.url, url, MAX_MESSAGE_SIZE);
+	strncpy(buf.text, url, MAX_MESSAGE_SIZE);
 
 	msgsnd(manager->qid, &buf, strlen(url)+1, 0);
+}
+
+void browser_manager_change_css_file(browser_manager_t *manager, const char *css_file)
+{
+	if (manager->qid == -1)
+		return;
+
+	struct text_message buf;
+	buf.type = MESSAGE_TYPE_CSS;
+	strncpy(buf.text, css_file, MAX_MESSAGE_SIZE);
+
+	msgsnd(manager->qid, &buf, strlen(css_file)+1, 0);
 }
 
 void browser_manager_change_size(browser_manager_t *manager, uint32_t width, uint32_t height)

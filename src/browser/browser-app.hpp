@@ -35,6 +35,7 @@ public:
 	int GetQueueId() { return qid; };
 	CefRefPtr<CefBrowser> GetBrowser() { return browser; };
 	void SizeChanged();
+	void CssChanged(const char *css_file);
 
 private:
 	void InitSharedData();
@@ -51,6 +52,7 @@ private:
 	int fd;
 	int qid;
 	struct shared_data *data;
+	std::string css;
 
 	IMPLEMENT_REFCOUNTING(BrowserApp);
 };
