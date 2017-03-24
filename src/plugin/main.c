@@ -129,6 +129,7 @@ static void reload_hotkey_pressed(void *vptr, obs_hotkey_id id, obs_hotkey_t *ke
 	UNUSED_PARAMETER(pressed);
 
 	struct browser_data *data = vptr;
+	browser_manager_change_css_file(data->manager, data->css_file);
 	browser_manager_reload_page(data->manager);
 }
 
@@ -193,6 +194,7 @@ static bool reload_button_clicked(obs_properties_t *props, obs_property_t *prope
 	UNUSED_PARAMETER(props);
 	UNUSED_PARAMETER(property);
 	struct browser_data *data = vptr;
+	browser_manager_change_css_file(data->manager, data->css_file);
 	browser_manager_reload_page(data->manager);
 	return true;
 }
@@ -203,6 +205,7 @@ static bool restart_button_clicked(obs_properties_t *props, obs_property_t *prop
 	UNUSED_PARAMETER(property);
 	struct browser_data *data = vptr;
 	browser_manager_restart_browser(data->manager);
+	browser_manager_change_css_file(data->manager, data->css_file);
 	browser_manager_change_url(data->manager, data->url);
 	return true;
 }
