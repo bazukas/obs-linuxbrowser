@@ -34,7 +34,7 @@ Run `make install` to copy plugin binaries into $HOME/.config/obs-studio/plugins
 # Flash
 
 You can enable flash by providing path to pepper flash library file and its version.
-Some distributions provide packages with the plugin, or you can extract one from google chrome installation.
+Some distributions provide packages with the plugin, or you can extract one from google chrome installation (you can easily find out location and version by opening chrome://flash/).
 Flash version can be found in manifest.json that is usually found in same directory as .so file.
 
 # Known issues
