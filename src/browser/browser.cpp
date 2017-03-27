@@ -33,6 +33,7 @@ int main(int argc, char* argv[])
 	dir.resize(dir.length() - strlen("/bin/64bit/browser"));
 	std::string resources_dir = dir + "/data/cef";
 	std::string locales_dir = resources_dir + "/locales";
+	std::string cache_dir = dir + "/cache";
 	std::string subprocess_path = std::string(argv[0]) + "-subprocess";
 
 	CefRefPtr<BrowserApp> app(new BrowserApp(argv[1]));
@@ -42,7 +43,7 @@ int main(int argc, char* argv[])
 	CefString(&settings.browser_subprocess_path).FromString(subprocess_path);
 	CefString(&settings.resources_dir_path).FromString(resources_dir);
 	CefString(&settings.locales_dir_path).FromString(locales_dir);
-	CefString(&settings.cache_path).FromString(dir);
+	CefString(&settings.cache_path).FromString(cache_dir);
 	settings.no_sandbox = true;
 	settings.windowless_rendering_enabled = true;
 

@@ -13,19 +13,20 @@ terms of browser capabilities.
 
 ## Building CEF
 
-* Download CEF binary release from http://opensource.spotify.com/cefbuilds/index.html
+* Download CEF standard binary release from http://opensource.spotify.com/cefbuilds/index.html
 * Extract and cd into folder
 * Run `cmake ./ && make`
 
 ## Building Plugin
 
-Make sure you have obs-studio installed. You might need to set `OBS_INCLUDE` and `OBS_LIB`
-env variables (see Makefile).
+Make sure you have obs-studio installed.
 
-* export `CEF_DIR` environment variable setting it to downloaded and built CEF release, for example
-`export CEF_DIR=/opt/cef`
-
-* cd into obs-linuxbrowser directory and run `make`
+* `cd obs-linuxbrowser`
+* `mkdir build`
+* `cd build`
+* `cmake -D CEF_DIR=<path to your cef dir> ..` You might need to also set `OBS_INCLUDE` and/or `OBS_LIB`
+build variables
+* `make`
 
 # Installing
 
