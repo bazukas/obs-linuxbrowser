@@ -9,6 +9,11 @@ terms of browser capabilities.
 
 ![Browser window](img/obs-linuxbrowser.png)
 
+# Installing
+
+* Download the latest release from [releases page](https://github.com/bazukas/obs-linuxbrowser/releases)
+* Extract contents of the archive into `$HOME/.config/obs-studio/plugins`
+
 # Building
 
 ## Building CEF
@@ -28,7 +33,7 @@ Make sure you have obs-studio installed.
 build variables
 * `make`
 
-# Installing
+## Installing
 
 Run `make install` to copy plugin binaries into $HOME/.config/obs-studio/plugins.
 
