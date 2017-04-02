@@ -53,15 +53,11 @@ static void spawn_renderer(browser_manager_t *manager)
 	char *renderer = bzalloc(renderer_size);
 	snprintf(renderer, renderer_size, "%sbrowser", bin_dir);
 
-	size_t path_size = strlen("LD_LIBRARY_PATH=") + strlen(bin_dir)+1;
-	char *path = bzalloc(path_size);
-	snprintf(path, path_size, "LD_LIBRARY_PATH=%s", bin_dir);
-
 	char *argv[] = { renderer, manager->shmname, flash_path, flash_version, NULL };
 
 	manager->pid = fork();
 	if (manager->pid == 0) {
-		putenv(path);
+		setenv("LD_LIBRARY_PATH", bin_dir, 1);
 		execv(renderer, argv);
 	}
 
@@ -69,7 +65,6 @@ static void spawn_renderer(browser_manager_t *manager)
 	bfree(flash_path);
 	bfree(flash_version);
 	bfree(renderer);
-	bfree(path);
 }
 
 static void kill_renderer(browser_manager_t *manager)
