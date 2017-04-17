@@ -53,7 +53,9 @@ static void spawn_renderer(browser_manager_t *manager)
 	char *renderer = bzalloc(renderer_size);
 	snprintf(renderer, renderer_size, "%sbrowser", bin_dir);
 
-	char *argv[] = { renderer, manager->shmname, flash_path, flash_version, NULL };
+	char *data_path = (char *) obs_get_module_data_path(obs_current_module());
+
+	char *argv[] = { renderer, data_path, manager->shmname, flash_path, flash_version, NULL };
 
 	manager->pid = fork();
 	if (manager->pid == 0) {
