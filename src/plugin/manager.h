@@ -28,13 +28,11 @@ typedef struct browser_manager {
 	int pid;
 	int qid;
 	char *shmname;
-	char *flash_path;
-	char *flash_version;
+	obs_data_t *settings;
 	struct shared_data *data;
 } browser_manager_t;
 
-browser_manager_t *create_browser_manager(uint32_t width, uint32_t height, int fps,
-		const char *flash_path, const char *flash_version);
+browser_manager_t *create_browser_manager(uint32_t width, uint32_t height, int fps, obs_data_t *settings);
 void destroy_browser_manager(browser_manager_t *manager);
 void lock_browser_manager(browser_manager_t *manager);
 void unlock_browser_manager(browser_manager_t *manager);
@@ -45,9 +43,6 @@ void browser_manager_change_css_file(browser_manager_t *manager, const char *css
 void browser_manager_change_size(browser_manager_t *manager, uint32_t width, uint32_t height);
 void browser_manager_reload_page(browser_manager_t *manager);
 void browser_manager_restart_browser(browser_manager_t *manager);
-
-void browser_manager_set_flash(browser_manager_t *manager,
-		const char *flash_path, const char *flash_version);
 
 void browser_manager_send_mouse_click(browser_manager_t *manager, int32_t x, int32_t y,
 		uint32_t modifiers, int32_t button_type, bool mouse_up, uint32_t click_count);

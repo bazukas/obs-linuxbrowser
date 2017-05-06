@@ -29,8 +29,6 @@ struct browser_data {
 	uint32_t width;
 	uint32_t height;
 	uint32_t fps;
-	char *flash_path;
-	char *flash_version;
 	char *css_file;
 
 	/* internal data */
@@ -68,13 +66,10 @@ static void browser_update(void *vptr, obs_data_t *settings)
 	else
 		url = obs_data_get_string(settings, "url");
 
-	const char *flash_path = obs_data_get_string(settings, "flash_path");
-	const char *flash_version = obs_data_get_string(settings, "flash_version");
 	const char *css_file = obs_data_get_string(settings, "css_file");
 
 	if (!data->manager)
-		data->manager = create_browser_manager(data->width, data->height,
-			data->fps, flash_path, flash_version);
+		data->manager = create_browser_manager(data->width, data->height, data->fps, settings);
 
 	/* comparing and saving c-strings is tedious */
 	if (!data->url || strcmp(url, data->url) != 0) {
@@ -88,18 +83,6 @@ static void browser_update(void *vptr, obs_data_t *settings)
 			data->url = bstrdup(url);
 		}
 		browser_manager_change_url(data->manager, data->url);
-	}
-	if (!data->flash_path || strcmp(flash_path, data->flash_path) != 0) {
-		if (data->flash_path)
-			bfree(data->flash_path);
-		data->flash_path = bstrdup(flash_path);
-		browser_manager_set_flash(data->manager, data->flash_path, data->flash_version);
-	}
-	if (!data->flash_version || strcmp(flash_version, data->flash_version) != 0) {
-		if (data->flash_version)
-			bfree(data->flash_version);
-		data->flash_version = bstrdup(flash_version);
-		browser_manager_set_flash(data->manager, data->flash_path, data->flash_version);
 	}
 	if (!data->css_file || strcmp(css_file, data->css_file) != 0) {
 		if (data->css_file)
@@ -167,10 +150,6 @@ static void browser_destroy(void *vptr)
 
 	if (data->url)
 		bfree(data->url);
-	if (data->flash_path)
-		bfree(data->flash_path);
-	if (data->flash_version)
-		bfree(data->flash_version);
 	if (data->css_file)
 		bfree(data->css_file);
 	bfree(data);
@@ -248,6 +227,8 @@ static obs_properties_t *browser_get_properties(void *vptr)
 	obs_properties_add_path(props, "flash_path", obs_module_text("FlashPath"),
 			OBS_PATH_FILE, "*.so", NULL);
 	obs_properties_add_text(props, "flash_version", obs_module_text("FlashVersion"), OBS_TEXT_DEFAULT);
+	obs_properties_add_editable_list(props, "cef_command_line", obs_module_text("CommandLineArguments"),
+			OBS_EDITABLE_LIST_TYPE_STRINGS, NULL, NULL);
 
 	obs_properties_add_button(props, "restart", obs_module_text("RestartBrowser"), restart_button_clicked);
 

@@ -41,13 +41,16 @@ static void spawn_renderer(browser_manager_t *manager)
 	char *s = strrchr(bin_dir, '/');
 	if (s) *(s+1) = '\0';
 
-	size_t flash_path_size = strlen("--ppapi-flash-path=") + strlen(manager->flash_path) + 1;
-	char *flash_path = bzalloc(flash_path_size);
-	snprintf(flash_path, flash_path_size, "--ppapi-flash-path=%s", manager->flash_path);
+	const char *sflash_path = obs_data_get_string(manager->settings, "flash_path");
+	const char *sflash_version = obs_data_get_string(manager->settings, "flash_version");
 
-	size_t flash_version_size = strlen("--ppapi-flash-version=") + strlen(manager->flash_version) + 1;
+	size_t flash_path_size = strlen("--ppapi-flash-path=") + strlen(sflash_path) + 1;
+	char *flash_path = bzalloc(flash_path_size);
+	snprintf(flash_path, flash_path_size, "--ppapi-flash-path=%s", sflash_path);
+
+	size_t flash_version_size = strlen("--ppapi-flash-version=") + strlen(sflash_version) + 1;
 	char *flash_version = bzalloc(flash_version_size);
-	snprintf(flash_version, flash_version_size, "--ppapi-flash-version=%s", manager->flash_version);
+	snprintf(flash_version, flash_version_size, "--ppapi-flash-version=%s", sflash_version);
 
 	size_t renderer_size = strlen(bin_dir) + strlen("browser") + 1;
 	char *renderer = bzalloc(renderer_size);
@@ -55,13 +58,36 @@ static void spawn_renderer(browser_manager_t *manager)
 
 	char *data_path = (char *) obs_get_module_data_path(obs_current_module());
 
-	char *argv[] = { renderer, data_path, manager->shmname, flash_path, flash_version, NULL };
+	obs_data_array_t *command_lines = obs_data_get_array(manager->settings, "cef_command_line");
+	size_t arg_num = 6 + obs_data_array_count(command_lines);
+
+	char **argv = bzalloc(sizeof(char *) * arg_num);
+	argv[0] = renderer;
+	argv[1] = data_path;
+	argv[2] = manager->shmname;
+	argv[3] = flash_path;
+	argv[4] = flash_version;
+
+	for (int i = 0; i < arg_num - 6; ++i) {
+		obs_data_t *item = obs_data_array_item(command_lines, i);
+		const char *value = obs_data_get_string(item, "value");
+		argv[5 + i] = bstrdup(value);
+		obs_data_release(item);
+	}
+
+	argv[arg_num-1] = NULL;
 
 	manager->pid = fork();
 	if (manager->pid == 0) {
 		setenv("LD_LIBRARY_PATH", bin_dir, 1);
 		execv(renderer, argv);
 	}
+
+	for (int i = 0; i < arg_num - 6; ++i) {
+		bfree(argv[5+i]);
+	}
+	obs_data_array_release(command_lines);
+	bfree(argv);
 
 	bfree(bin_dir);
 	bfree(flash_path);
@@ -78,13 +104,13 @@ static void kill_renderer(browser_manager_t *manager)
 }
 
 /* setting up shared data for the browser process */
-browser_manager_t *create_browser_manager(uint32_t width, uint32_t height, int fps,
-			const char *flash_path, const char *flash_version)
+browser_manager_t *create_browser_manager(uint32_t width, uint32_t height, int fps, obs_data_t *settings)
 {
 	if (width > MAX_BROWSER_WIDTH || height > MAX_BROWSER_HEIGHT)
 		return NULL;
 
 	struct browser_manager *manager = bzalloc(sizeof(struct browser_manager));
+	manager->settings = settings;
 
 	manager->qid = msgget(IPC_PRIVATE, S_IRUSR | S_IWUSR);
 	if (manager->qid == -1) {
@@ -112,8 +138,6 @@ browser_manager_t *create_browser_manager(uint32_t width, uint32_t height, int f
 	manager->data->width = width;
 	manager->data->height = height;
 	manager->data->fps = fps;
-	manager->flash_path = bstrdup(flash_path);
-	manager->flash_version = bstrdup(flash_version);
 
 	pthread_mutexattr_t attrmutex;
 	pthread_mutexattr_init(&attrmutex);
@@ -135,10 +159,6 @@ void destroy_browser_manager(browser_manager_t *manager) {
 	}
 	if (manager->shmname)
 		bfree(manager->shmname);
-	if (manager->flash_path)
-		bfree(manager->flash_path);
-	if (manager->flash_version)
-		bfree(manager->flash_version);
 	bfree(manager);
 }
 
@@ -214,16 +234,6 @@ void browser_manager_restart_browser(browser_manager_t *manager)
 	kill_renderer(manager);
 	spawn_renderer(manager);
 	pthread_mutex_unlock(&manager->data->mutex);
-}
-
-void browser_manager_set_flash(browser_manager_t *manager, const char *flash_path, const char *flash_version)
-{
-	if (manager->flash_path)
-		bfree(manager->flash_path);
-	manager->flash_path = bstrdup(flash_path);
-	if (manager->flash_version)
-		bfree(manager->flash_version);
-	manager->flash_version = bstrdup(flash_version);
 }
 
 void browser_manager_send_mouse_click(browser_manager_t *manager, int32_t x, int32_t y,
