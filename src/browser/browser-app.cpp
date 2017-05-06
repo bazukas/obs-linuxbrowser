@@ -100,7 +100,7 @@ static void *MessageThread(void *vptr)
 		if (received != -1) {
 			switch (msg.type) {
 			case MESSAGE_TYPE_URL:
-				url.FromASCII(tmsg->text);
+				url.FromString(std::string(tmsg->text));
 				ba->GetBrowser()->GetMainFrame()->LoadURL(url);
 				break;
 			case MESSAGE_TYPE_SIZE:
