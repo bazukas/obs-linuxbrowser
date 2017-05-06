@@ -15,6 +15,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include <fcntl.h>
+#include <signal.h>
+#include <sys/inotify.h>
 #include <sys/mman.h>
 #include <sys/msg.h>
 #include <unistd.h>
@@ -23,10 +25,35 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "browser-app.hpp"
 
+/* for signal handling */
+int static_in_fd = 0;
+BrowserApp *ba = NULL;
+static void file_changed(int signum)
+{
+	struct inotify_event event;
+
+	if (static_in_fd != 0 && ba != NULL) {
+		read(static_in_fd, (void *) &event, sizeof(struct inotify_event));
+		ba->ReloadPage();
+	}
+}
+
 BrowserApp::BrowserApp(char *shmname)
 {
 	if (shmname != NULL && strncmp(shmname, SHM_NAME, strlen(SHM_NAME)) == 0) {
 		shm_name = strdup(shmname);
+
+		/* init inotify */
+		in_fd = inotify_init1(IN_NONBLOCK);
+		fcntl(in_fd, F_SETFL, O_ASYNC);
+		fcntl(in_fd, F_SETOWN, getpid());
+		struct sigaction action;
+		memset(&action, 0, sizeof(struct sigaction));
+		action.sa_handler = file_changed;
+		sigaction(SIGIO, &action, NULL);
+		static_in_fd = in_fd;
+		ba = this;
+
 		InitSharedData();
 	}
 }
@@ -36,6 +63,8 @@ BrowserApp::~BrowserApp()
 	UninitSharedData();
 	if (shm_name)
 		free(shm_name);
+	if (in_fd)
+		close(in_fd);
 }
 
 /* open shared memory and read initial data */
@@ -83,7 +112,6 @@ static void *MessageThread(void *vptr)
 	BrowserApp *ba = (BrowserApp *) vptr;
 	size_t max_buf_size = MAX_MESSAGE_SIZE;
 	ssize_t received;
-	CefString url;
 	CefMouseEvent e;
 	CefKeyEvent ke;
 
@@ -100,14 +128,13 @@ static void *MessageThread(void *vptr)
 		if (received != -1) {
 			switch (msg.type) {
 			case MESSAGE_TYPE_URL:
-				url.FromString(std::string(tmsg->text));
-				ba->GetBrowser()->GetMainFrame()->LoadURL(url);
+				ba->UrlChanged(tmsg->text);
 				break;
 			case MESSAGE_TYPE_SIZE:
 				ba->SizeChanged();
 				break;
 			case MESSAGE_TYPE_RELOAD:
-				ba->GetBrowser()->ReloadIgnoreCache();
+				ba->ReloadPage();
 				break;
 			case MESSAGE_TYPE_CSS:
 				ba->CssChanged(tmsg->text);
@@ -164,6 +191,22 @@ void BrowserApp::SizeChanged()
 	pthread_mutex_unlock(&data->mutex);
 }
 
+void BrowserApp::UrlChanged(const char *url)
+{
+	CefString cef_url;
+	cef_url.FromString(std::string(url));
+	browser->GetMainFrame()->LoadURL(cef_url);
+
+	if (in_wd >= 0) {
+		inotify_rm_watch(in_fd, in_wd);
+		in_wd = -1;
+	}
+
+	if (strncmp(url, "file:///", strlen("file:///")) == 0) {
+		in_wd = inotify_add_watch(in_fd, url+strlen("file://"), IN_MODIFY);
+	}
+}
+
 void BrowserApp::CssChanged(const char *css_file)
 {
 	/* read file into string */
@@ -177,6 +220,11 @@ void BrowserApp::CssChanged(const char *css_file)
 	}
 
 	client->ChangeCss(css);
+}
+
+void BrowserApp::ReloadPage()
+{
+	browser->ReloadIgnoreCache();
 }
 
 /* browser instance created in this callback */
