@@ -12,7 +12,8 @@ terms of browser capabilities.
 # Installing
 
 * Download the latest release from [releases page](https://github.com/bazukas/obs-linuxbrowser/releases) (built with mp3 support)
-* Extract contents of the archive into `$HOME/.config/obs-studio/plugins`
+* `mkdir -p $HOME/.config/obs-studio/plugins`
+* `tar xfvz linuxbrowser0.2.0-obs18.0.1-64bit.tgz -C $HOME/.config/obs-studio/plugins`
 
 You don't need to build the plugin if you downloaded a binary release, instructions below are for people
 who want to compile the plugin themselves.
