@@ -40,11 +40,13 @@ public:
 			int httpStatusCode) OVERRIDE;
 
 	void ChangeCss(std::string css) { this->css = css; };
-	void SetScrollbars(bool show) { this->show_scrollbars = show; };
+	void SetScrollbars(CefRefPtr<CefBrowser> browser, bool show);
+	void SetZoom(CefRefPtr<CefBrowser> browser, uint32_t zoom);
 private:
 	struct shared_data *data;
 	std::string css;
 	bool show_scrollbars = true;
+	uint32_t zoom;
 
 	IMPLEMENT_REFCOUNTING(BrowserClient);
 };

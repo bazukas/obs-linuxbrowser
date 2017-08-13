@@ -44,6 +44,7 @@ struct shared_data {
 #define MESSAGE_TYPE_FOCUS 8
 #define MESSAGE_TYPE_KEY 9
 #define MESSAGE_TYPE_SCROLLBARS 10
+#define MESSAGE_TYPE_ZOOM 11
 
 struct generic_message {
 	long type;
@@ -93,4 +94,9 @@ struct key_message {
 	uint32_t native_vkey;
 	uint32_t modifiers;
 	char chr;
+};
+
+struct zoom_message {
+	long type;
+	uint32_t zoom;
 };

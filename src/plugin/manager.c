@@ -229,6 +229,17 @@ void browser_manager_set_scrollbars(browser_manager_t *manager, bool show)
 	msgsnd(manager->qid, &buf, 1, 0);
 }
 
+void browser_manager_set_zoom(browser_manager_t *manager, uint32_t zoom)
+{
+	if (manager->qid == -1)
+		return;
+
+	struct zoom_message buf;
+	buf.type = MESSAGE_TYPE_ZOOM;
+	buf.zoom = zoom;
+	msgsnd(manager->qid, &buf, sizeof(zoom), 0);
+}
+
 void browser_manager_reload_page(browser_manager_t *manager)
 {
 	if (manager->qid == -1)

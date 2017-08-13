@@ -122,6 +122,7 @@ static void *MessageThread(void *vptr)
 	struct mouse_wheel_message *wmsg = (struct mouse_wheel_message *) &msg;
 	struct focus_message *fmsg = (struct focus_message *) &msg;
 	struct key_message *kmsg = (struct key_message *) &msg;
+	struct zoom_message *zmsg = (struct zoom_message *) &msg;
 
 	while (true) {
 		received = msgrcv(ba->GetQueueId(), &msg, max_buf_size, 0, MSG_NOERROR);
@@ -179,6 +180,9 @@ static void *MessageThread(void *vptr)
 			case MESSAGE_TYPE_SCROLLBARS:
 				ba->SetScrollbars((bool) msg.data[0]);
 				break;
+			case MESSAGE_TYPE_ZOOM:
+				ba->SetZoom(zmsg->zoom);
+				break;
 			}
 		}
 	}
@@ -227,15 +231,12 @@ void BrowserApp::CssChanged(const char *css_file)
 
 void BrowserApp::SetScrollbars(bool show)
 {
-	CefRefPtr<CefFrame> frame = browser->GetMainFrame();
-	if (show) {
-		frame->ExecuteJavaScript(std::string("document.documentElement.style.overflow = 'auto';"),
-			frame->GetURL(), 0);
-	} else {
-		frame->ExecuteJavaScript(std::string("document.documentElement.style.overflow = 'hidden';"),
-			frame->GetURL(), 0);
-	}
-	client->SetScrollbars(show);
+	client->SetScrollbars(browser, show);
+}
+
+void BrowserApp::SetZoom(uint32_t zoom)
+{
+	client->SetZoom(browser, zoom);
 }
 
 void BrowserApp::ReloadPage()

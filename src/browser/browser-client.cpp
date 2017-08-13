@@ -16,6 +16,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include <algorithm>
+#include <math.h>
 
 #include "base64.hpp"
 #include "browser-client.hpp"
@@ -61,8 +62,26 @@ void BrowserClient::OnLoadEnd(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame>
 
 		frame->ExecuteJavaScript(script, href, 0);
 	}
-	if (!show_scrollbars) {
+	SetScrollbars(browser, show_scrollbars);
+	SetZoom(browser, zoom);
+}
+
+void BrowserClient::SetScrollbars(CefRefPtr<CefBrowser> browser, bool show)
+{
+	this->show_scrollbars = show;
+	CefRefPtr<CefFrame> frame = browser->GetMainFrame();
+	if (show) {
+		frame->ExecuteJavaScript(std::string("document.documentElement.style.overflow = 'auto';"),
+			frame->GetURL(), 0);
+	} else {
 		frame->ExecuteJavaScript(std::string("document.documentElement.style.overflow = 'hidden';"),
 			frame->GetURL(), 0);
 	}
+}
+
+void BrowserClient::SetZoom(CefRefPtr<CefBrowser> browser, uint32_t zoom)
+{
+	this->zoom = zoom;
+	double zoom_scale = log(zoom / 100.0) / log(1.2);
+	browser->GetHost()->SetZoomLevel(zoom_scale);
 }

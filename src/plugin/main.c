@@ -31,6 +31,7 @@ struct browser_data {
 	uint32_t fps;
 	char *css_file;
 	bool hide_scrollbars;
+	uint32_t zoom;
 
 	/* internal data */
 	obs_source_t *source;
@@ -60,6 +61,7 @@ static void browser_update(void *vptr, obs_data_t *settings)
 	data->height = height;
 	data->fps = obs_data_get_int(settings, "fps");
 	bool hide_scrollbars = obs_data_get_bool(settings, "hide_scrollbars");
+	uint32_t zoom = obs_data_get_int(settings, "zoom");
 
 	bool is_local = obs_data_get_bool(settings, "is_local_file");
 	const char *url;
@@ -76,6 +78,10 @@ static void browser_update(void *vptr, obs_data_t *settings)
 	if (data->hide_scrollbars != hide_scrollbars) {
 		data->hide_scrollbars = hide_scrollbars;
 		browser_manager_set_scrollbars(data->manager, !hide_scrollbars);
+	}
+	if(data->zoom != zoom) {
+		data->zoom = zoom;
+		browser_manager_set_zoom(data->manager, zoom);
 	}
 
 	/* comparing and saving c-strings is tedious */
@@ -193,6 +199,8 @@ static bool restart_button_clicked(obs_properties_t *props, obs_property_t *prop
 	browser_manager_restart_browser(data->manager);
 	browser_manager_change_css_file(data->manager, data->css_file);
 	browser_manager_change_url(data->manager, data->url);
+	browser_manager_set_scrollbars(data->manager, !data->hide_scrollbars);
+	browser_manager_set_zoom(data->manager, data->zoom);
 	return true;
 }
 
@@ -226,6 +234,7 @@ static obs_properties_t *browser_get_properties(void *vptr)
 	obs_properties_add_int(props, "height", obs_module_text("Height"), 1, MAX_BROWSER_HEIGHT, 1);
 	obs_properties_add_int(props, "fps", obs_module_text("FPS"), 1, 60, 1);
 	obs_properties_add_bool(props, "hide_scrollbars", obs_module_text("HideScrollbars"));
+	obs_properties_add_int(props, "zoom", obs_module_text("Zoom"), 1, 500, 1);
 
 	obs_properties_add_button(props, "reload", obs_module_text("ReloadPage"), reload_button_clicked);
 
@@ -251,6 +260,7 @@ static void browser_get_defaults(obs_data_t *settings)
 	obs_data_set_default_int(settings, "fps", 30);
 	obs_data_set_default_string(settings, "flash_path", "");
 	obs_data_set_default_string(settings, "flash_version", "");
+	obs_data_set_default_int(settings, "zoom", 100);
 }
 
 static void browser_tick(void *vptr, float seconds)
