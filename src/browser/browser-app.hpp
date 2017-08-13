@@ -38,6 +38,7 @@ public:
 	void UrlChanged(const char *url);
 	void CssChanged(const char *css_file);
 	void ReloadPage();
+	void SetScrollbars(bool show);
 private:
 	void InitSharedData();
 	void UninitSharedData();

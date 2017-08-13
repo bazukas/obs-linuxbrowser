@@ -218,6 +218,17 @@ void browser_manager_change_size(browser_manager_t *manager, uint32_t width, uin
 	pthread_mutex_unlock(&manager->data->mutex);
 }
 
+void browser_manager_set_scrollbars(browser_manager_t *manager, bool show)
+{
+	if (manager->qid == -1)
+		return;
+
+	struct generic_message buf;
+	buf.type = MESSAGE_TYPE_SCROLLBARS;
+	buf.data[0] = (uint8_t) show;
+	msgsnd(manager->qid, &buf, 1, 0);
+}
+
 void browser_manager_reload_page(browser_manager_t *manager)
 {
 	if (manager->qid == -1)

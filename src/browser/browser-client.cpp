@@ -61,4 +61,8 @@ void BrowserClient::OnLoadEnd(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame>
 
 		frame->ExecuteJavaScript(script, href, 0);
 	}
+	if (!show_scrollbars) {
+		frame->ExecuteJavaScript(std::string("document.documentElement.style.overflow = 'hidden';"),
+			frame->GetURL(), 0);
+	}
 }

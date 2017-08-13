@@ -30,6 +30,7 @@ struct browser_data {
 	uint32_t height;
 	uint32_t fps;
 	char *css_file;
+	bool hide_scrollbars;
 
 	/* internal data */
 	obs_source_t *source;
@@ -58,6 +59,7 @@ static void browser_update(void *vptr, obs_data_t *settings)
 	data->width = width;
 	data->height = height;
 	data->fps = obs_data_get_int(settings, "fps");
+	bool hide_scrollbars = obs_data_get_bool(settings, "hide_scrollbars");
 
 	bool is_local = obs_data_get_bool(settings, "is_local_file");
 	const char *url;
@@ -70,6 +72,11 @@ static void browser_update(void *vptr, obs_data_t *settings)
 
 	if (!data->manager)
 		data->manager = create_browser_manager(data->width, data->height, data->fps, settings);
+
+	if (data->hide_scrollbars != hide_scrollbars) {
+		data->hide_scrollbars = hide_scrollbars;
+		browser_manager_set_scrollbars(data->manager, !hide_scrollbars);
+	}
 
 	/* comparing and saving c-strings is tedious */
 	if (!data->url || strcmp(url, data->url) != 0) {
@@ -193,7 +200,7 @@ static bool is_local_file_modified(obs_properties_t *props, obs_property_t *prop
 		obs_data_t *settings)
 {
 	UNUSED_PARAMETER(prop);
-	
+
 	bool enabled = obs_data_get_bool(settings, "is_local_file");
 	obs_property_t *url = obs_properties_get(props, "url");
 	obs_property_t *local_file = obs_properties_get(props, "local_file");
@@ -218,6 +225,7 @@ static obs_properties_t *browser_get_properties(void *vptr)
 	obs_properties_add_int(props, "width", obs_module_text("Width"), 1, MAX_BROWSER_WIDTH, 1);
 	obs_properties_add_int(props, "height", obs_module_text("Height"), 1, MAX_BROWSER_HEIGHT, 1);
 	obs_properties_add_int(props, "fps", obs_module_text("FPS"), 1, 60, 1);
+	obs_properties_add_bool(props, "hide_scrollbars", obs_module_text("HideScrollbars"));
 
 	obs_properties_add_button(props, "reload", obs_module_text("ReloadPage"), reload_button_clicked);
 

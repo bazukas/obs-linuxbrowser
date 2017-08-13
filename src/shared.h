@@ -43,6 +43,7 @@ struct shared_data {
 #define MESSAGE_TYPE_MOUSE_WHEEL 7
 #define MESSAGE_TYPE_FOCUS 8
 #define MESSAGE_TYPE_KEY 9
+#define MESSAGE_TYPE_SCROLLBARS 10
 
 struct generic_message {
 	long type;

@@ -40,9 +40,11 @@ public:
 			int httpStatusCode) OVERRIDE;
 
 	void ChangeCss(std::string css) { this->css = css; };
+	void SetScrollbars(bool show) { this->show_scrollbars = show; };
 private:
 	struct shared_data *data;
 	std::string css;
+	bool show_scrollbars = true;
 
 	IMPLEMENT_REFCOUNTING(BrowserClient);
 };

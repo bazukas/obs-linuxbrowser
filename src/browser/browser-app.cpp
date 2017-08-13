@@ -33,7 +33,7 @@ static void file_changed(int signum)
 	struct inotify_event event;
 
 	if (static_in_fd != 0 && ba != NULL) {
-		read(static_in_fd, (void *) &event, sizeof(struct inotify_event));
+		(void)(read(static_in_fd, (void *) &event, sizeof(struct inotify_event))+1);
 		ba->ReloadPage();
 	}
 }
@@ -176,6 +176,9 @@ static void *MessageThread(void *vptr)
 				}
 				ba->GetBrowser()->GetHost()->SendKeyEvent(ke);
 				break;
+			case MESSAGE_TYPE_SCROLLBARS:
+				ba->SetScrollbars((bool) msg.data[0]);
+				break;
 			}
 		}
 	}
@@ -220,6 +223,19 @@ void BrowserApp::CssChanged(const char *css_file)
 	}
 
 	client->ChangeCss(css);
+}
+
+void BrowserApp::SetScrollbars(bool show)
+{
+	CefRefPtr<CefFrame> frame = browser->GetMainFrame();
+	if (show) {
+		frame->ExecuteJavaScript(std::string("document.documentElement.style.overflow = 'auto';"),
+			frame->GetURL(), 0);
+	} else {
+		frame->ExecuteJavaScript(std::string("document.documentElement.style.overflow = 'hidden';"),
+			frame->GetURL(), 0);
+	}
+	client->SetScrollbars(show);
 }
 
 void BrowserApp::ReloadPage()
