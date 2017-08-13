@@ -77,6 +77,7 @@ void BrowserClient::SetScrollbars(CefRefPtr<CefBrowser> browser, bool show)
 		frame->ExecuteJavaScript(std::string("document.documentElement.style.overflow = 'hidden';"),
 			frame->GetURL(), 0);
 	}
+	SetScroll(browser, scroll_vertical, scroll_horizontal);
 }
 
 void BrowserClient::SetZoom(CefRefPtr<CefBrowser> browser, uint32_t zoom)
@@ -84,4 +85,14 @@ void BrowserClient::SetZoom(CefRefPtr<CefBrowser> browser, uint32_t zoom)
 	this->zoom = zoom;
 	double zoom_scale = log(zoom / 100.0) / log(1.2);
 	browser->GetHost()->SetZoomLevel(zoom_scale);
+}
+
+void BrowserClient::SetScroll(CefRefPtr<CefBrowser> browser, uint32_t vertical, uint32_t horizontal)
+{
+	this->scroll_vertical = vertical;
+	this->scroll_horizontal = horizontal;
+	CefRefPtr<CefFrame> frame = browser->GetMainFrame();
+	std::string script = "window.scrollTo(";
+	script += std::to_string(horizontal) + "," + std::to_string(vertical) + ");";
+	frame->ExecuteJavaScript(script, frame->GetURL(), 0);
 }

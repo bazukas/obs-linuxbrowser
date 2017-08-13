@@ -38,8 +38,8 @@ public:
 	void UrlChanged(const char *url);
 	void CssChanged(const char *css_file);
 	void ReloadPage();
-	void SetScrollbars(bool show);
-	void SetZoom(uint32_t zoom);
+
+	CefRefPtr<BrowserClient> GetClient() { return client; };
 private:
 	void InitSharedData();
 	void UninitSharedData();

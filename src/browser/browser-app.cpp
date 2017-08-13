@@ -123,6 +123,7 @@ static void *MessageThread(void *vptr)
 	struct focus_message *fmsg = (struct focus_message *) &msg;
 	struct key_message *kmsg = (struct key_message *) &msg;
 	struct zoom_message *zmsg = (struct zoom_message *) &msg;
+	struct scroll_message *smsg = (struct scroll_message *) &msg;
 
 	while (true) {
 		received = msgrcv(ba->GetQueueId(), &msg, max_buf_size, 0, MSG_NOERROR);
@@ -178,10 +179,14 @@ static void *MessageThread(void *vptr)
 				ba->GetBrowser()->GetHost()->SendKeyEvent(ke);
 				break;
 			case MESSAGE_TYPE_SCROLLBARS:
-				ba->SetScrollbars((bool) msg.data[0]);
+				ba->GetClient()->SetScrollbars(ba->GetBrowser(), (bool) msg.data[0]);
 				break;
 			case MESSAGE_TYPE_ZOOM:
-				ba->SetZoom(zmsg->zoom);
+				ba->GetClient()->SetZoom(ba->GetBrowser(), zmsg->zoom);
+				break;
+			case MESSAGE_TYPE_SCROLL:
+				ba->GetClient()->SetScroll(ba->GetBrowser(),
+						smsg->vertical, smsg->horizontal);
 				break;
 			}
 		}
@@ -227,16 +232,6 @@ void BrowserApp::CssChanged(const char *css_file)
 	}
 
 	client->ChangeCss(css);
-}
-
-void BrowserApp::SetScrollbars(bool show)
-{
-	client->SetScrollbars(browser, show);
-}
-
-void BrowserApp::SetZoom(uint32_t zoom)
-{
-	client->SetZoom(browser, zoom);
 }
 
 void BrowserApp::ReloadPage()

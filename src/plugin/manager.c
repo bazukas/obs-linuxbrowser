@@ -240,6 +240,18 @@ void browser_manager_set_zoom(browser_manager_t *manager, uint32_t zoom)
 	msgsnd(manager->qid, &buf, sizeof(zoom), 0);
 }
 
+void browser_manager_set_scroll(browser_manager_t *manager, uint32_t vertical, uint32_t horizontal)
+{
+	if (manager->qid == -1)
+		return;
+
+	struct scroll_message buf;
+	buf.type = MESSAGE_TYPE_SCROLL;
+	buf.vertical = vertical;
+	buf.horizontal = horizontal;
+	msgsnd(manager->qid, &buf, sizeof(vertical) + sizeof(horizontal), 0);
+}
+
 void browser_manager_reload_page(browser_manager_t *manager)
 {
 	if (manager->qid == -1)

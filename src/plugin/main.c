@@ -32,6 +32,8 @@ struct browser_data {
 	char *css_file;
 	bool hide_scrollbars;
 	uint32_t zoom;
+	uint32_t scroll_vertical;
+	uint32_t scroll_horizontal;
 
 	/* internal data */
 	obs_source_t *source;
@@ -62,6 +64,8 @@ static void browser_update(void *vptr, obs_data_t *settings)
 	data->fps = obs_data_get_int(settings, "fps");
 	bool hide_scrollbars = obs_data_get_bool(settings, "hide_scrollbars");
 	uint32_t zoom = obs_data_get_int(settings, "zoom");
+	uint32_t scroll_vertical = obs_data_get_int(settings, "scroll_vertical");
+	uint32_t scroll_horizontal = obs_data_get_int(settings, "scroll_horizontal");
 
 	bool is_local = obs_data_get_bool(settings, "is_local_file");
 	const char *url;
@@ -79,9 +83,14 @@ static void browser_update(void *vptr, obs_data_t *settings)
 		data->hide_scrollbars = hide_scrollbars;
 		browser_manager_set_scrollbars(data->manager, !hide_scrollbars);
 	}
-	if(data->zoom != zoom) {
+	if (data->zoom != zoom) {
 		data->zoom = zoom;
 		browser_manager_set_zoom(data->manager, zoom);
+	}
+	if (data->scroll_vertical != scroll_vertical || data->scroll_horizontal != scroll_horizontal) {
+		data->scroll_vertical = scroll_vertical;
+		data->scroll_horizontal = scroll_horizontal;
+		browser_manager_set_scroll(data->manager, scroll_vertical, scroll_horizontal);
 	}
 
 	/* comparing and saving c-strings is tedious */
@@ -201,6 +210,7 @@ static bool restart_button_clicked(obs_properties_t *props, obs_property_t *prop
 	browser_manager_change_url(data->manager, data->url);
 	browser_manager_set_scrollbars(data->manager, !data->hide_scrollbars);
 	browser_manager_set_zoom(data->manager, data->zoom);
+	browser_manager_set_scroll(data->manager, data->scroll_vertical, data->scroll_horizontal);
 	return true;
 }
 
@@ -235,6 +245,10 @@ static obs_properties_t *browser_get_properties(void *vptr)
 	obs_properties_add_int(props, "fps", obs_module_text("FPS"), 1, 60, 1);
 	obs_properties_add_bool(props, "hide_scrollbars", obs_module_text("HideScrollbars"));
 	obs_properties_add_int(props, "zoom", obs_module_text("Zoom"), 1, 500, 1);
+	obs_properties_add_int(props, "scroll_vertical", obs_module_text("ScrollVertical"),
+			0, 10000000, 1);
+	obs_properties_add_int(props, "scroll_horizontal", obs_module_text("ScrollHorizontal"),
+			0, 10000000, 1);
 
 	obs_properties_add_button(props, "reload", obs_module_text("ReloadPage"), reload_button_clicked);
 

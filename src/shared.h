@@ -45,6 +45,7 @@ struct shared_data {
 #define MESSAGE_TYPE_KEY 9
 #define MESSAGE_TYPE_SCROLLBARS 10
 #define MESSAGE_TYPE_ZOOM 11
+#define MESSAGE_TYPE_SCROLL 12
 
 struct generic_message {
 	long type;
@@ -99,4 +100,10 @@ struct key_message {
 struct zoom_message {
 	long type;
 	uint32_t zoom;
+};
+
+struct scroll_message {
+	long type;
+	uint32_t vertical;
+	uint32_t horizontal;
 };

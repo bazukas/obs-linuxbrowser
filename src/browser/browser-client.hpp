@@ -42,11 +42,14 @@ public:
 	void ChangeCss(std::string css) { this->css = css; };
 	void SetScrollbars(CefRefPtr<CefBrowser> browser, bool show);
 	void SetZoom(CefRefPtr<CefBrowser> browser, uint32_t zoom);
+	void SetScroll(CefRefPtr<CefBrowser> browser, uint32_t vertical, uint32_t horizontal);
 private:
 	struct shared_data *data;
 	std::string css;
 	bool show_scrollbars = true;
 	uint32_t zoom;
+	uint32_t scroll_vertical;
+	uint32_t scroll_horizontal;
 
 	IMPLEMENT_REFCOUNTING(BrowserClient);
 };
