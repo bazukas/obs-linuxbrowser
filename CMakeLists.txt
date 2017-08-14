@@ -60,9 +60,9 @@ set(BROWSER_SUBPROCESS_SOURCES
 add_library(obs-linuxbrowser MODULE ${PLUGIN_SOURCES})
 target_link_libraries(obs-linuxbrowser obs rt)
 add_executable(browser ${BROWSER_SOURCES})
-target_link_libraries(browser cef pthread rt ${CEF_WRAPPER})
+target_link_libraries(browser cef pthread rt ${CEF_WRAPPER} -static-libstdc++)
 add_executable(browser-subprocess ${BROWSER_SUBPROCESS_SOURCES})
-target_link_libraries(browser-subprocess cef pthread rt ${CEF_WRAPPER})
+target_link_libraries(browser-subprocess cef pthread rt ${CEF_WRAPPER} -static-libstdc++)
 
 # install
 install(DIRECTORY ${PLUGIN_DIRECTORY} DESTINATION $ENV{HOME}/.config/obs-studio/plugins USE_SOURCE_PERMISSIONS)
