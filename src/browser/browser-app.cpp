@@ -246,7 +246,6 @@ void BrowserApp::OnContextInitialized()
 		return;
 
 	CefWindowInfo info;
-	info.transparent_painting_enabled = true;
 	info.width = width;
 	info.height = height;
 	info.windowless_rendering_enabled = true;
