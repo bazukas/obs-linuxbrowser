@@ -34,6 +34,7 @@ struct browser_data {
 	uint32_t zoom;
 	uint32_t scroll_vertical;
 	uint32_t scroll_horizontal;
+	bool reload_on_scene;
 
 	/* internal data */
 	obs_source_t *source;
@@ -66,6 +67,7 @@ static void browser_update(void *vptr, obs_data_t *settings)
 	uint32_t zoom = obs_data_get_int(settings, "zoom");
 	uint32_t scroll_vertical = obs_data_get_int(settings, "scroll_vertical");
 	uint32_t scroll_horizontal = obs_data_get_int(settings, "scroll_horizontal");
+	data->reload_on_scene = obs_data_get_bool(settings, "reload_on_scene");
 
 	bool is_local = obs_data_get_bool(settings, "is_local_file");
 	const char *url;
@@ -200,6 +202,13 @@ static bool reload_button_clicked(obs_properties_t *props, obs_property_t *prope
 	return true;
 }
 
+static void reload_on_scene(void* vptr)
+{
+	struct browser_data* data = vptr;
+	if (data->reload_on_scene)
+		reload_button_clicked(NULL, NULL, vptr);
+}
+
 static bool restart_button_clicked(obs_properties_t *props, obs_property_t *property, void *vptr)
 {
 	UNUSED_PARAMETER(props);
@@ -251,6 +260,7 @@ static obs_properties_t *browser_get_properties(void *vptr)
 			0, 10000000, 1);
 
 	obs_properties_add_button(props, "reload", obs_module_text("ReloadPage"), reload_button_clicked);
+	obs_properties_add_bool(props, "reload_on_scene", obs_module_text("ReloadOnScene"));
 
 	obs_properties_add_path(props, "css_file", obs_module_text("CustomCSS"),
 			OBS_PATH_FILE, "*.css", NULL);
@@ -376,6 +386,7 @@ bool obs_module_load(void)
 	info.video_tick     = browser_tick;
 	info.video_render   = browser_render;
 
+	info.activate		= reload_on_scene;
 	info.mouse_click    = browser_mouse_click;
 	info.mouse_move     = browser_mouse_move;
 	info.mouse_wheel    = browser_mouse_wheel;
