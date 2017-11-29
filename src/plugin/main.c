@@ -206,7 +206,7 @@ static void reload_on_scene(void* vptr)
 {
 	struct browser_data* data = vptr;
 	if (data->reload_on_scene)
-		reload_button_clicked(NULL, NULL, vptr);
+		browser_manager_reload_page(data->manager);
 }
 
 static bool restart_button_clicked(obs_properties_t *props, obs_property_t *property, void *vptr)
