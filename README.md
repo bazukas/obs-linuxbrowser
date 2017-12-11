@@ -11,9 +11,9 @@ terms of browser capabilities.
 
 # Installing
 
-* Download the latest release from [releases page](https://github.com/bazukas/obs-linuxbrowser/releases) (built with mp3 support)
+* Download the latest release from [releases page](https://github.com/bazukas/obs-linuxbrowser/releases) (built with mp3 support). Make sure the release version matches obs-studio version on your system. (Currently 20.0.1 for Ubuntu and 19.0.3 for Debian).
 * `mkdir -p $HOME/.config/obs-studio/plugins`
-* `tar xfvz linuxbrowser0.3.0-obs20.0.1-64bit.tgz -C $HOME/.config/obs-studio/plugins/`
+* `tar xfvz linuxbrowser0.3.1-obs20.0.1-64bit.tgz -C $HOME/.config/obs-studio/plugins/`
 
 You don't need to build the plugin if you downloaded a binary release, instructions below are for people
 who want to compile the plugin themselves.
