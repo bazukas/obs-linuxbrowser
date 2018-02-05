@@ -257,6 +257,7 @@ void BrowserApp::OnContextInitialized()
 	this->client = client;
 
 	browser = CefBrowserHost::CreateBrowserSync(info, client.get(), "http://google.com", settings, NULL);
+	client->SetScroll(browser, 0, 0);  /* workaround for scroll to bottom bug */
 
 	pthread_create(&message_thread, NULL, MessageThread, this);
 }

@@ -387,7 +387,7 @@ bool obs_module_load(void)
 	info.video_tick     = browser_tick;
 	info.video_render   = browser_render;
 
-	info.activate		= reload_on_scene;
+	info.activate       = reload_on_scene;
 	info.mouse_click    = browser_mouse_click;
 	info.mouse_move     = browser_mouse_move;
 	info.mouse_wheel    = browser_mouse_wheel;
