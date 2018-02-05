@@ -32,7 +32,7 @@ typedef struct browser_manager {
 	struct shared_data *data;
 } browser_manager_t;
 
-browser_manager_t *create_browser_manager(uint32_t width, uint32_t height, int fps, obs_data_t *settings);
+browser_manager_t *create_browser_manager(uint32_t width, uint32_t height, int fps, obs_data_t *settings, const char *uid);
 void destroy_browser_manager(browser_manager_t *manager);
 void lock_browser_manager(browser_manager_t *manager);
 void unlock_browser_manager(browser_manager_t *manager);

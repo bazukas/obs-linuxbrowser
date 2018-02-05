@@ -26,10 +26,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "manager.h"
 
-char *get_shm_name(int uid)
+char *get_shm_name(const char *uid)
 {
 	char *shm_name = bzalloc(SHM_MAX);
-	snprintf(shm_name, SHM_MAX, "%s%d", SHM_NAME, uid);
+	snprintf(shm_name, SHM_MAX, "%s-%s", SHM_NAME, uid);
+	// escape out '/' character
+	char *current_pos = strchr(shm_name+1, '/');
+	while (current_pos) {
+		*current_pos = '|';
+		current_pos = strchr(current_pos, '/');
+	}
 	return shm_name;
 }
 
@@ -104,7 +110,7 @@ static void kill_renderer(browser_manager_t *manager)
 }
 
 /* setting up shared data for the browser process */
-browser_manager_t *create_browser_manager(uint32_t width, uint32_t height, int fps, obs_data_t *settings)
+browser_manager_t *create_browser_manager(uint32_t width, uint32_t height, int fps, obs_data_t *settings, const char *uid)
 {
 	if (width > MAX_BROWSER_WIDTH || height > MAX_BROWSER_HEIGHT)
 		return NULL;
@@ -118,7 +124,7 @@ browser_manager_t *create_browser_manager(uint32_t width, uint32_t height, int f
 		return NULL;
 	}
 
-	manager->shmname = get_shm_name(rand());
+	manager->shmname = get_shm_name(uid);
 	manager->fd = shm_open(manager->shmname, O_CREAT | O_RDWR, S_IRUSR | S_IWUSR);
 	if (manager->fd == -1) {
 		blog(LOG_ERROR, "shm_open error");

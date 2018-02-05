@@ -79,7 +79,8 @@ static void browser_update(void *vptr, obs_data_t *settings)
 	const char *css_file = obs_data_get_string(settings, "css_file");
 
 	if (!data->manager)
-		data->manager = create_browser_manager(data->width, data->height, data->fps, settings);
+		data->manager = create_browser_manager(data->width, data->height, data->fps, settings,
+					obs_source_get_name(data->source));
 
 	if (data->hide_scrollbars != hide_scrollbars) {
 		data->hide_scrollbars = hide_scrollbars;

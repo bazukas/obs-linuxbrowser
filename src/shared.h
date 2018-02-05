@@ -17,7 +17,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #pragma once
 
-#define SHM_NAME "/obslinuxbrowser"
+#define SHM_NAME "/linuxbrowser"
 #define SHM_MAX 50
 
 #define MAX_BROWSER_WIDTH 4096

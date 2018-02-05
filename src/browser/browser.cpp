@@ -14,8 +14,10 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+#include <pwd.h>
 #include <signal.h>
 #include <sys/prctl.h>
+#include <unistd.h>
 
 #include <include/cef_app.h>
 
@@ -32,7 +34,8 @@ int main(int argc, char* argv[])
 	std::string data_dir(argv[1]);
 	std::string resources_dir = data_dir + "/cef";
 	std::string locales_dir = resources_dir + "/locales";
-	std::string cache_dir = "/tmp/linuxbrowser-cache/" + std::string(argv[2]);
+	std::string home_dir = getpwuid(getuid())->pw_dir;
+	std::string cache_dir = home_dir + "/.cache/obs-linuxbrowser/" + std::string(argv[2]);
 	std::string subprocess_path = std::string(argv[0]) + "-subprocess";
 
 	CefRefPtr<BrowserApp> app(new BrowserApp(argv[2]));
