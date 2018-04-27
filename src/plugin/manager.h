@@ -56,3 +56,5 @@ void browser_manager_send_mouse_wheel(browser_manager_t *manager, int32_t x, int
 void browser_manager_send_focus(browser_manager_t *manager, bool focus);
 void browser_manager_send_key(browser_manager_t *manager, bool key_up, uint32_t native_vkey,
 		uint32_t modifiers, char chr);
+void browser_manager_send_active_state_change(browser_manager_t* manager, bool active);
+void browser_manager_send_visibility_change(browser_manager_t* manager, bool visible);
