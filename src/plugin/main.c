@@ -371,28 +371,28 @@ static void browser_key_click(void *vptr, const struct obs_key_event *event, boo
 
 static void cb_activate(void* vptr)
 {
-    reload_on_scene(vptr);
+	reload_on_scene(vptr);
 
-    struct browser_data* data = vptr;
-    browser_manager_send_active_state_change(data->manager, true);
+	struct browser_data* data = vptr;
+	browser_manager_send_active_state_change(data->manager, true);
 }
 
 static void cb_deactivate(void* vptr)
 {
-    struct browser_data* data = vptr;
-    browser_manager_send_active_state_change(data->manager, false);
+	struct browser_data* data = vptr;
+	browser_manager_send_active_state_change(data->manager, false);
 }
 
 static void cb_show(void* vptr)
 {
-    struct browser_data* data = vptr;
-    browser_manager_send_visibility_change(data->manager, true);
+	struct browser_data* data = vptr;
+	browser_manager_send_visibility_change(data->manager, true);
 }
 
 static void cb_hide(void* vptr)
 {
-    struct browser_data* data = vptr;
-    browser_manager_send_visibility_change(data->manager, false);
+	struct browser_data* data = vptr;
+	browser_manager_send_visibility_change(data->manager, false);
 }
 
 bool obs_module_load(void)
