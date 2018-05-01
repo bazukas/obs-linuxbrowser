@@ -20,31 +20,40 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "shared.h"
 
-class BrowserClient : public CefClient,
-                      public CefRenderHandler,
-		      public CefLoadHandler {
+class BrowserClient
+    : public CefClient
+    , public CefRenderHandler
+    , public CefLoadHandler {
 public:
-	BrowserClient(struct shared_data *data, std::string css);
+	BrowserClient(struct shared_data* data, std::string css);
 
-	virtual CefRefPtr<CefRenderHandler> GetRenderHandler()
-		OVERRIDE { return this; }
-	virtual CefRefPtr<CefLoadHandler> GetLoadHandler()
-		OVERRIDE { return this; }
+	virtual CefRefPtr<CefRenderHandler> GetRenderHandler() OVERRIDE
+	{
+		return this;
+	}
+	virtual CefRefPtr<CefLoadHandler> GetLoadHandler() OVERRIDE
+	{
+		return this;
+	}
 
-	virtual bool GetViewRect(CefRefPtr<CefBrowser> browser, CefRect &rect) OVERRIDE;
+	virtual bool GetViewRect(CefRefPtr<CefBrowser> browser, CefRect& rect) OVERRIDE;
 	virtual void OnPaint(CefRefPtr<CefBrowser> browser, CefRenderHandler::PaintElementType type,
-			const CefRenderHandler::RectList &dirtyRects, const void *buffer,
-			int width, int height) OVERRIDE;
+	                     const CefRenderHandler::RectList& dirtyRects, const void* buffer,
+	                     int width, int height) OVERRIDE;
 
 	virtual void OnLoadEnd(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame,
-			int httpStatusCode) OVERRIDE;
+	                       int httpStatusCode) OVERRIDE;
 
-	void ChangeCss(std::string css) { this->css = css; };
+	void ChangeCss(std::string css)
+	{
+		this->css = css;
+	};
 	void SetScrollbars(CefRefPtr<CefBrowser> browser, bool show);
 	void SetZoom(CefRefPtr<CefBrowser> browser, uint32_t zoom);
 	void SetScroll(CefRefPtr<CefBrowser> browser, uint32_t vertical, uint32_t horizontal);
+
 private:
-	struct shared_data *data;
+	struct shared_data* data;
 	std::string css;
 	bool show_scrollbars = true;
 	uint32_t zoom;
