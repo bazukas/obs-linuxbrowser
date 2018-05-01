@@ -369,7 +369,7 @@ static void browser_key_click(void *vptr, const struct obs_key_event *event, boo
 			event->modifiers, chr);
 }
 
-static void cb_activate(void* vptr)
+static void browser_source_activate(void* vptr)
 {
 	reload_on_scene(vptr);
 
@@ -377,19 +377,19 @@ static void cb_activate(void* vptr)
 	browser_manager_send_active_state_change(data->manager, true);
 }
 
-static void cb_deactivate(void* vptr)
+static void browser_source_deactivate(void* vptr)
 {
 	struct browser_data* data = vptr;
 	browser_manager_send_active_state_change(data->manager, false);
 }
 
-static void cb_show(void* vptr)
+static void browser_source_show(void* vptr)
 {
 	struct browser_data* data = vptr;
 	browser_manager_send_visibility_change(data->manager, true);
 }
 
-static void cb_hide(void* vptr)
+static void browser_source_hide(void* vptr)
 {
 	struct browser_data* data = vptr;
 	browser_manager_send_visibility_change(data->manager, false);
@@ -419,10 +419,10 @@ bool obs_module_load(void)
 	info.focus          = browser_focus;
 	info.key_click      = browser_key_click;
 
-	info.activate       = cb_activate;
-	info.deactivate     = cb_deactivate;
-	info.show           = cb_show;
-	info.hide           = cb_hide;
+	info.activate       = browser_source_activate;
+	info.deactivate     = browser_source_deactivate;
+	info.show           = browser_source_show;
+	info.hide           = browser_source_hide;
 
 	obs_register_source(&info);
 	return true;
