@@ -11,12 +11,17 @@ terms of browser capabilities.
 
 # Installing
 
-* Download the latest release from [releases page](https://github.com/bazukas/obs-linuxbrowser/releases). Make sure the release version matches obs-studio version on your system. (Currently 20.0.1 for Ubuntu and 19.0.3 for Debian).
+* Download the latest release from [releases page](https://github.com/bazukas/obs-linuxbrowser/releases). Make sure the release version matches obs-studio version on your system. (Currently 20.0.1 for Ubuntu).
 * `mkdir -p $HOME/.config/obs-studio/plugins`
 * `tar xfvz linuxbrowser0.3.1-obs20.0.1-64bit.tgz -C $HOME/.config/obs-studio/plugins/`
+* Install the dependencies: libgconf-2-4 (`sudo apt-get install libgconf-2-4` in Ubuntu)
 
 You don't need to build the plugin if you downloaded a binary release, instructions below are for people
 who want to compile the plugin themselves.
+
+Note from current maintainer: Because of lack of time and interest I don't plan on providing binary releases anymore.
+Last available release works with newer OBS versions and shouldn't break. If you need functionality that has been
+added since the last release, you can build the plugin using instructions below.
 
 # Building
 
@@ -39,7 +44,8 @@ build variables
 
 ## Installing
 
-Run `make install` to copy plugin binaries into $HOME/.config/obs-studio/plugins.
+* Run `make install` to copy plugin binaries into $HOME/.config/obs-studio/plugins.
+* Make sure libgconf-2-4 dependency installed in your system
 
 # Flash
 
