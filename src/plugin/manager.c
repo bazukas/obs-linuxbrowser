@@ -357,22 +357,22 @@ void browser_manager_send_key(browser_manager_t *manager, bool key_up, uint32_t 
 
 void browser_manager_send_active_state_change(browser_manager_t* manager, bool active)
 {
-    if (manager->qid == -1)
-        return;
+	if (manager->qid == -1)
+		return;
 
-    struct active_state_message buf;
-    buf.type = MESSAGE_TYPE_ACTIVE_STATE_CHANGE;
-    buf.active = active;
-    msgsnd(manager->qid, &buf, sizeof(struct active_state_message), 0);
+	struct active_state_message buf;
+	buf.type = MESSAGE_TYPE_ACTIVE_STATE_CHANGE;
+	buf.active = active;
+	msgsnd(manager->qid, &buf, sizeof(struct active_state_message), 0);
 }
 
 void browser_manager_send_visibility_change(browser_manager_t* manager, bool visible)
 {
-    if (manager->qid == -1)
-        return;
+	if (manager->qid == -1)
+		return;
 
-    struct visibility_message buf;
-    buf.type = MESSAGE_TYPE_VISIBILITY_CHANGE;
-    buf.visible = visible;
-    msgsnd(manager->qid, &buf, sizeof(struct visibility_message), 0);
+	struct visibility_message buf;
+	buf.type = MESSAGE_TYPE_VISIBILITY_CHANGE;
+	buf.visible = visible;
+	msgsnd(manager->qid, &buf, sizeof(struct visibility_message), 0);
 }

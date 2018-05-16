@@ -125,7 +125,7 @@ static void *MessageThread(void *vptr)
 	struct zoom_message *zmsg = (struct zoom_message *) &msg;
 	struct scroll_message *smsg = (struct scroll_message *) &msg;
 	struct active_state_message* amsg = (struct active_state_message*) &msg;
-    struct visibility_message* vmsg = (struct visibility_message*) &msg;
+	struct visibility_message* vmsg = (struct visibility_message*) &msg;
 
 	while (true) {
 		received = msgrcv(ba->GetQueueId(), &msg, max_buf_size, 0, MSG_NOERROR);

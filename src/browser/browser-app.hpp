@@ -32,8 +32,8 @@ public:
 	virtual CefRefPtr<CefBrowserProcessHandler> GetBrowserProcessHandler()
 		OVERRIDE { return this; }
 
-    virtual CefRefPtr<CefRenderProcessHandler> GetRenderProcessHandler()
-        override { return this; }
+	virtual CefRefPtr<CefRenderProcessHandler> GetRenderProcessHandler()
+		override { return this; }
 
 	virtual void OnContextInitialized() OVERRIDE;
 
@@ -46,29 +46,29 @@ public:
 
 	CefRefPtr<BrowserClient> GetClient() { return client; }
 
-    virtual void OnContextCreated(CefRefPtr<CefBrowser> browser,
-                          CefRefPtr<CefFrame> frame,
-                          CefRefPtr<CefV8Context> context) override;
+	virtual void OnContextCreated(CefRefPtr<CefBrowser> browser,
+                                      CefRefPtr<CefFrame> frame,
+                                      CefRefPtr<CefV8Context> context) override;
 
-    virtual bool OnProcessMessageReceived(CefRefPtr<CefBrowser> browser,
-                                  CefProcessId source_process,
-                                  CefRefPtr<CefProcessMessage> message) override;
+	virtual bool OnProcessMessageReceived(CefRefPtr<CefBrowser> browser,
+                                              CefProcessId source_process,
+                                              CefRefPtr<CefProcessMessage> message) override;
 
-    void UpdateActiveStateJS(bool active);
-    void UpdateVisibilityStateJS(bool visible);
+	void UpdateActiveStateJS(bool active);
+	void UpdateVisibilityStateJS(bool visible);
 
-    virtual bool Execute(const CefString& name,
-                 CefRefPtr<CefV8Value> object,
-                 const CefV8ValueList& arguments,
-                 CefRefPtr<CefV8Value>& retval,
-                 CefString& exception) override;
+	virtual bool Execute(const CefString& name,
+                             CefRefPtr<CefV8Value> object,
+                             const CefV8ValueList& arguments,
+                             CefRefPtr<CefV8Value>& retval,
+                             CefString& exception) override;
 private:
 	void InitSharedData();
 	void UninitSharedData();
 
-    void ExecuteJSFunction(CefRefPtr<CefBrowser> browser,
-                           const char* functionName,
-                           CefV8ValueList arguments);
+	void ExecuteJSFunction(CefRefPtr<CefBrowser> browser,
+                               const char* functionName,
+                               CefV8ValueList arguments);
 
 private:
 	CefRefPtr<CefBrowser> browser;

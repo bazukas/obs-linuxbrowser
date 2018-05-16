@@ -111,11 +111,11 @@ struct scroll_message {
 };
 
 struct active_state_message {
-    long type;
-    bool active;
+	long type;
+	bool active;
 };
 
 struct visibility_message {
-    long type;
-    bool visible;
+	long type;
+	bool visible;
 };
