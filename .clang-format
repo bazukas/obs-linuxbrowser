@@ -1,5 +1,5 @@
 BasedOnStyle: LLVM                                          # LLVM, Google, Chromium, Mozilla, WebKit
-AccessModifierOffset: -4
+AccessModifierOffset: -8
 AlignEscapedNewlinesLeft: true
 AlignTrailingComments: true
 AllowAllParametersOfDeclarationOnNextLine: false
@@ -34,8 +34,8 @@ BreakConstructorInitializers: BeforeComma
 ColumnLimit: 100
 # CommentPragmas
 ConstructorInitializerAllOnOneLineOrOnePerLine: true
-ConstructorInitializerIndentWidth: 4
-ContinuationIndentWidth: 2
+ConstructorInitializerIndentWidth: 8
+ContinuationIndentWidth: 4
 Cpp11BracedListStyle: true
 DerivePointerAlignment: false
 DisableFormat: false
@@ -55,7 +55,7 @@ IncludeBlocks: Preserve
 #      Priority: 5
 IndentCaseLabels: false
 # IndentPPDirectives: false
-IndentWidth: 4
+IndentWidth: 8
 IndentWrappedFunctionNames: false
 KeepEmptyLinesAtTheStartOfBlocks: false
 Language: Cpp                                               # None, Cpp, JavaScript, Proto
@@ -81,5 +81,5 @@ SpacesInContainerLiterals: false
 SpacesInParentheses: false
 SpacesInSquareBrackets: false
 Standard: Cpp11                                             # Cpp03, Cpp11, Auto
-TabWidth: 4
+TabWidth: 8
 UseTab: ForIndentation                                      # Never(false), ForIndentation, Always(true)
