@@ -46,6 +46,8 @@ struct shared_data {
 #define MESSAGE_TYPE_SCROLLBARS 10
 #define MESSAGE_TYPE_ZOOM 11
 #define MESSAGE_TYPE_SCROLL 12
+#define MESSAGE_TYPE_ACTIVE_STATE_CHANGE 13
+#define MESSAGE_TYPE_VISIBILITY_CHANGE 14
 
 struct generic_message {
 	long type;
@@ -106,4 +108,14 @@ struct scroll_message {
 	long type;
 	uint32_t vertical;
 	uint32_t horizontal;
+};
+
+struct active_state_message {
+	long type;
+	bool active;
+};
+
+struct visibility_message {
+	long type;
+	bool visible;
 };

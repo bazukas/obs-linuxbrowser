@@ -93,7 +93,7 @@ void BrowserApp::InitSharedData()
 	data = (struct shared_data *) mmap(NULL, sizeof(struct shared_data) + MAX_DATA_SIZE,
 			PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
 	if (data == MAP_FAILED) {
-		printf("Browser: data remapping faileda\n");
+		printf("Browser: data remapping failed\n");
 		return;
 	}
 
@@ -124,6 +124,8 @@ static void *MessageThread(void *vptr)
 	struct key_message *kmsg = (struct key_message *) &msg;
 	struct zoom_message *zmsg = (struct zoom_message *) &msg;
 	struct scroll_message *smsg = (struct scroll_message *) &msg;
+	struct active_state_message* amsg = (struct active_state_message*) &msg;
+	struct visibility_message* vmsg = (struct visibility_message*) &msg;
 
 	while (true) {
 		received = msgrcv(ba->GetQueueId(), &msg, max_buf_size, 0, MSG_NOERROR);
@@ -187,6 +189,12 @@ static void *MessageThread(void *vptr)
 			case MESSAGE_TYPE_SCROLL:
 				ba->GetClient()->SetScroll(ba->GetBrowser(),
 						smsg->vertical, smsg->horizontal);
+				break;
+			case MESSAGE_TYPE_ACTIVE_STATE_CHANGE:
+				ba->UpdateActiveStateJS(amsg->active);
+				break;
+			case MESSAGE_TYPE_VISIBILITY_CHANGE:
+				ba->UpdateVisibilityStateJS(vmsg->visible);
 				break;
 			}
 		}
@@ -260,4 +268,74 @@ void BrowserApp::OnContextInitialized()
 	client->SetScroll(browser, 0, 0);  /* workaround for scroll to bottom bug */
 
 	pthread_create(&message_thread, NULL, MessageThread, this);
+}
+
+void BrowserApp::OnContextCreated(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame,
+                                  CefRefPtr<CefV8Context> context)
+{
+	CefRefPtr<CefV8Value> globalObj = context->GetGlobal();
+
+	CefRefPtr<CefV8Value> obsStudioObj = CefV8Value::CreateObject(0, 0);
+	globalObj->SetValue("obsstudio", obsStudioObj, V8_PROPERTY_ATTRIBUTE_NONE);
+}
+
+bool BrowserApp::OnProcessMessageReceived(CefRefPtr<CefBrowser> browser,
+                                          CefProcessId source_process,
+                                          CefRefPtr<CefProcessMessage> message)
+{
+	DCHECK(source_process == PID_BROWSER);
+
+	CefRefPtr<CefListValue> args = message->GetArgumentList();
+
+	if (message->GetName() == "Visibility") {
+		CefV8ValueList arguments{CefV8Value::CreateBool(args->GetBool(0))};
+		ExecuteJSFunction(browser, "onVisiblityChange", arguments);
+	} else if (message->GetName() == "Active") {
+		CefV8ValueList arguments{CefV8Value::CreateBool(args->GetBool(0))};
+		ExecuteJSFunction(browser, "onActiveChange", arguments);
+	} else {
+		return false;
+	}
+
+	return true;
+}
+
+void BrowserApp::ExecuteJSFunction(CefRefPtr<CefBrowser> browser, const char* functionName,
+                                   CefV8ValueList arguments)
+{
+	CefRefPtr<CefV8Context> context = browser->GetMainFrame()->GetV8Context();
+
+	context->Enter();
+
+	CefRefPtr<CefV8Value> globalObj = context->GetGlobal();
+	CefRefPtr<CefV8Value> obsStudioObj = globalObj->GetValue("obsstudio");
+	CefRefPtr<CefV8Value> jsFunction = obsStudioObj->GetValue(functionName);
+
+	if (jsFunction && jsFunction->IsFunction()) {
+		jsFunction->ExecuteFunction(NULL, arguments);
+	}
+
+	context->Exit();
+}
+
+bool BrowserApp::Execute(const CefString& name, CefRefPtr<CefV8Value> object,
+                         const CefV8ValueList& arguments, CefRefPtr<CefV8Value>& retval,
+                         CefString& exception)
+{
+	return true;
+}
+
+void BrowserApp::UpdateActiveStateJS(bool active)
+{
+	CefRefPtr<CefProcessMessage> msg{CefProcessMessage::Create("Active")};
+	msg->GetArgumentList()->SetBool(0, active);
+	this->browser->SendProcessMessage(PID_BROWSER, msg);
+}
+
+void BrowserApp::UpdateVisibilityStateJS(bool visible)
+{
+	CefRefPtr<CefProcessMessage> msg = CefProcessMessage::Create("Visibility");
+	CefRefPtr<CefListValue> args = msg->GetArgumentList();
+	args->SetBool(0, visible);
+	this->browser->SendProcessMessage(PID_BROWSER, msg);
 }

@@ -369,6 +369,32 @@ static void browser_key_click(void *vptr, const struct obs_key_event *event, boo
 			event->modifiers, chr);
 }
 
+static void browser_source_activate(void* vptr)
+{
+	reload_on_scene(vptr);
+
+	struct browser_data* data = vptr;
+	browser_manager_send_active_state_change(data->manager, true);
+}
+
+static void browser_source_deactivate(void* vptr)
+{
+	struct browser_data* data = vptr;
+	browser_manager_send_active_state_change(data->manager, false);
+}
+
+static void browser_source_show(void* vptr)
+{
+	struct browser_data* data = vptr;
+	browser_manager_send_visibility_change(data->manager, true);
+}
+
+static void browser_source_hide(void* vptr)
+{
+	struct browser_data* data = vptr;
+	browser_manager_send_visibility_change(data->manager, false);
+}
+
 bool obs_module_load(void)
 {
 	struct obs_source_info info = {};
@@ -387,12 +413,16 @@ bool obs_module_load(void)
 	info.video_tick     = browser_tick;
 	info.video_render   = browser_render;
 
-	info.activate       = reload_on_scene;
 	info.mouse_click    = browser_mouse_click;
 	info.mouse_move     = browser_mouse_move;
 	info.mouse_wheel    = browser_mouse_wheel;
 	info.focus          = browser_focus;
 	info.key_click      = browser_key_click;
+
+	info.activate       = browser_source_activate;
+	info.deactivate     = browser_source_deactivate;
+	info.show           = browser_source_show;
+	info.hide           = browser_source_hide;
 
 	obs_register_source(&info);
 	return true;

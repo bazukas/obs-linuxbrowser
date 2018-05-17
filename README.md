@@ -52,3 +52,10 @@ build variables
 You can enable flash by providing path to pepper flash library file and its version.
 Some distributions provide packages with the plugin, or you can extract one from google chrome installation.
 Flash version can be found in manifest.json that is usually found in same directory as .so file.
+
+# JavaScript bindings
+All bindings are children of `window.obsstudio`.
+
+## Callbacks
+* `onActiveChange(bool isActive)` – called whenever the source becomes activated or deactivated
+* `onVisibilityChange(bool isVisible)` – called whenever the source is shown or hidden
