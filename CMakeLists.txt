@@ -2,6 +2,8 @@ cmake_minimum_required (VERSION 2.8)
 project (obs-linuxbrowser)
 set(CMAKE_BUILD_TYPE Release)
 
+set(LINUXBROWSER_VERSION 0.3.1)
+
 set(OBS_INCLUDE "/usr/include/obs" CACHE PATH "OBS Include Dir")
 set(OBS_LIB "/usr/lib" CACHE PATH "OBS Lib Dir")
 set(CEF_DIR "/opt/cef" CACHE PATH "CEF Binary Release Dir")
@@ -55,6 +57,11 @@ set(BROWSER_SOURCES
 set(BROWSER_SUBPROCESS_SOURCES
     ${BROWSER_SHARED_SOURCES}
     src/browser/browser.cpp
+)
+
+configure_file(
+    ${PROJECT_SOURCE_DIR}/src/config.h.in
+    ${PROJECT_SOURCE_DIR}/src/config.h
 )
 
 add_library(obs-linuxbrowser MODULE ${PLUGIN_SOURCES})

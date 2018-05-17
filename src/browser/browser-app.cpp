@@ -24,6 +24,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <fstream>
 
 #include "browser-app.hpp"
+#include "config.h"
 
 /* for signal handling */
 int static_in_fd = 0;
@@ -277,6 +278,12 @@ void BrowserApp::OnContextCreated(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFr
 
 	CefRefPtr<CefV8Value> obsStudioObj = CefV8Value::CreateObject(0, 0);
 	globalObj->SetValue("obsstudio", obsStudioObj, V8_PROPERTY_ATTRIBUTE_NONE);
+
+	obsStudioObj->SetValue("linuxbrowser", CefV8Value::CreateBool(true),
+		V8_PROPERTY_ATTRIBUTE_NONE);
+
+	obsStudioObj->SetValue("pluginVersion", CefV8Value::CreateString(LINUXBROWSER_VERSION),
+		V8_PROPERTY_ATTRIBUTE_NONE);
 }
 
 bool BrowserApp::OnProcessMessageReceived(CefRefPtr<CefBrowser> browser,
