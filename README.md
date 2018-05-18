@@ -67,4 +67,4 @@ Using obs-linuxbrowser with an older OBS version than the one which has been use
 ## OBS-Linuxbrowser not displaying any content with certain versions of CEF
 Some builds of CEF seem to be not working with obs-linuxbrowser.
 We weren't able to figure out the exact cause of this, but we assume that it's a CEF-related issue we can't fix.
-Check issue #63 for information about CEF versions that are known to be working.
+Check issue [#63](https://github.com/bazukas/obs-linuxbrowser/issues/63) for information about CEF versions that are known to be working.
