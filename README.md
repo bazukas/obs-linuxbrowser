@@ -19,10 +19,6 @@ terms of browser capabilities.
 You don't need to build the plugin if you downloaded a binary release, instructions below are for people
 who want to compile the plugin themselves.
 
-Note from current maintainer: Because of lack of time and interest I don't plan on providing binary releases anymore.
-Last available release works with newer OBS versions and shouldn't break. If you need functionality that has been
-added since the last release, you can build the plugin using instructions below.
-
 # Building
 
 ## Building CEF
