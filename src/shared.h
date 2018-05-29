@@ -22,7 +22,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #define MAX_BROWSER_WIDTH 4096
 #define MAX_BROWSER_HEIGHT 4096
-#define MAX_DATA_SIZE MAX_BROWSER_WIDTH * MAX_BROWSER_HEIGHT * 4
+#define MAX_DATA_SIZE MAX_BROWSER_WIDTH* MAX_BROWSER_HEIGHT * 4
 
 struct shared_data {
 	pthread_mutex_t mutex;
