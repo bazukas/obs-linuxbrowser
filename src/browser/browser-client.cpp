@@ -21,12 +21,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "base64.hpp"
 #include "browser-client.hpp"
 
-BrowserClient::BrowserClient(struct shared_data *data, std::string css) {
+BrowserClient::BrowserClient(struct shared_data* data, std::string css)
+{
 	this->data = data;
 	this->css = css;
 }
 
-bool BrowserClient::GetViewRect(CefRefPtr<CefBrowser> browser, CefRect &rect)
+bool BrowserClient::GetViewRect(CefRefPtr<CefBrowser> browser, CefRect& rect)
 {
 	pthread_mutex_lock(&data->mutex);
 	rect.Set(0, 0, data->width, data->height);
@@ -35,7 +36,8 @@ bool BrowserClient::GetViewRect(CefRefPtr<CefBrowser> browser, CefRect &rect)
 }
 
 void BrowserClient::OnPaint(CefRefPtr<CefBrowser> browser, CefRenderHandler::PaintElementType type,
-	const CefRenderHandler::RectList &dirtyRects, const void *buffer, int vwidth, int vheight)
+                            const CefRenderHandler::RectList& dirtyRects, const void* buffer,
+                            int vwidth, int vheight)
 {
 	/* don't draw popups for now */
 	if (type == PET_VIEW) {
@@ -46,11 +48,12 @@ void BrowserClient::OnPaint(CefRefPtr<CefBrowser> browser, CefRenderHandler::Pai
 	}
 }
 
-void BrowserClient::OnLoadEnd(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, int httpStatusCode)
+void BrowserClient::OnLoadEnd(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame,
+                              int httpStatusCode)
 {
 	if (frame->IsMain() && css != "") {
-		std::string base64EncodedCSS = base64_encode(reinterpret_cast<const unsigned char*>(css.c_str()),
-				css.length());
+		std::string base64EncodedCSS = base64_encode(
+		    reinterpret_cast<const unsigned char*>(css.c_str()), css.length());
 		std::string href = "data:text/css;charset=utf-8;base64," + base64EncodedCSS;
 
 		std::string script = "";
@@ -71,11 +74,13 @@ void BrowserClient::SetScrollbars(CefRefPtr<CefBrowser> browser, bool show)
 	this->show_scrollbars = show;
 	CefRefPtr<CefFrame> frame = browser->GetMainFrame();
 	if (show) {
-		frame->ExecuteJavaScript(std::string("document.documentElement.style.overflow = 'auto';"),
-			frame->GetURL(), 0);
+		frame->ExecuteJavaScript(
+		    std::string("document.documentElement.style.overflow = 'auto';"),
+		    frame->GetURL(), 0);
 	} else {
-		frame->ExecuteJavaScript(std::string("document.documentElement.style.overflow = 'hidden';"),
-			frame->GetURL(), 0);
+		frame->ExecuteJavaScript(
+		    std::string("document.documentElement.style.overflow = 'hidden';"),
+		    frame->GetURL(), 0);
 	}
 	SetScroll(browser, scroll_vertical, scroll_horizontal);
 }

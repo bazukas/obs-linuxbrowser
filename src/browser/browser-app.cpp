@@ -28,18 +28,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 /* for signal handling */
 int static_in_fd = 0;
-BrowserApp *ba = NULL;
+BrowserApp* ba = NULL;
 static void file_changed(int signum)
 {
 	struct inotify_event event;
 
 	if (static_in_fd != 0 && ba != NULL) {
-		(void)(read(static_in_fd, (void *) &event, sizeof(struct inotify_event))+1);
+		(void) (read(static_in_fd, (void*) &event, sizeof(struct inotify_event)) + 1);
 		ba->ReloadPage();
 	}
 }
 
-BrowserApp::BrowserApp(char *shmname)
+BrowserApp::BrowserApp(char* shmname)
 {
 	if (shmname != NULL && strncmp(shmname, SHM_NAME, strlen(SHM_NAME)) == 0) {
 		shm_name = strdup(shmname);
@@ -76,8 +76,8 @@ void BrowserApp::InitSharedData()
 		printf("Browser: shared memory open failed\n");
 		return;
 	}
-	data = (struct shared_data *) mmap(NULL, sizeof(struct shared_data),
-			PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+	data = (struct shared_data*) mmap(NULL, sizeof(struct shared_data), PROT_READ | PROT_WRITE,
+	                                  MAP_SHARED, fd, 0);
 
 	if (data == MAP_FAILED) {
 		printf("Browser: data mapping failed\n");
@@ -91,13 +91,12 @@ void BrowserApp::InitSharedData()
 	fps = data->fps;
 	pthread_mutex_unlock(&data->mutex);
 
-	data = (struct shared_data *) mmap(NULL, sizeof(struct shared_data) + MAX_DATA_SIZE,
-			PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+	data = (struct shared_data*) mmap(NULL, sizeof(struct shared_data) + MAX_DATA_SIZE,
+	                                  PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
 	if (data == MAP_FAILED) {
 		printf("Browser: data remapping failed\n");
 		return;
 	}
-
 }
 
 void BrowserApp::UninitSharedData()
@@ -108,15 +107,16 @@ void BrowserApp::UninitSharedData()
 }
 
 /* message receiver thread */
-static void *MessageThread(void *vptr)
+static void* MessageThread(void* vptr)
 {
-	BrowserApp *ba = (BrowserApp *) vptr;
+	BrowserApp* ba = (BrowserApp*) vptr;
 	size_t max_buf_size = MAX_MESSAGE_SIZE;
 	ssize_t received;
 	CefMouseEvent e;
 	CefKeyEvent ke;
 
 	struct generic_message msg;
+<<<<<<< HEAD
 	struct text_message *tmsg = (struct text_message *) &msg;
 	struct mouse_click_message *cmsg = (struct mouse_click_message *) &msg;
 	struct mouse_move_message *mmsg = (struct mouse_move_message *) &msg;
@@ -125,6 +125,16 @@ static void *MessageThread(void *vptr)
 	struct key_message *kmsg = (struct key_message *) &msg;
 	struct zoom_message *zmsg = (struct zoom_message *) &msg;
 	struct scroll_message *smsg = (struct scroll_message *) &msg;
+=======
+	struct text_message* tmsg = (struct text_message*) &msg;
+	struct mouse_click_message* cmsg = (struct mouse_click_message*) &msg;
+	struct mouse_move_message* mmsg = (struct mouse_move_message*) &msg;
+	struct mouse_wheel_message* wmsg = (struct mouse_wheel_message*) &msg;
+	struct focus_message* fmsg = (struct focus_message*) &msg;
+	struct key_message* kmsg = (struct key_message*) &msg;
+	struct zoom_message* zmsg = (struct zoom_message*) &msg;
+	struct scroll_message* smsg = (struct scroll_message*) &msg;
+>>>>>>> master
 	struct active_state_message* amsg = (struct active_state_message*) &msg;
 	struct visibility_message* vmsg = (struct visibility_message*) &msg;
 
@@ -148,22 +158,23 @@ static void *MessageThread(void *vptr)
 				e.modifiers = cmsg->modifiers;
 				e.x = cmsg->x;
 				e.y = cmsg->y;
-				ba->GetBrowser()->GetHost()->SendMouseClickEvent(e,
-					(CefBrowserHost::MouseButtonType) cmsg->button_type,
-					cmsg->mouse_up, cmsg->click_count);
+				ba->GetBrowser()->GetHost()->SendMouseClickEvent(
+				    e, (CefBrowserHost::MouseButtonType) cmsg->button_type,
+				    cmsg->mouse_up, cmsg->click_count);
 				break;
 			case MESSAGE_TYPE_MOUSE_MOVE:
 				e.modifiers = mmsg->modifiers;
 				e.x = mmsg->x;
 				e.y = mmsg->y;
-				ba->GetBrowser()->GetHost()->SendMouseMoveEvent(e, mmsg->mouse_leave);
+				ba->GetBrowser()->GetHost()->SendMouseMoveEvent(e,
+				                                                mmsg->mouse_leave);
 				break;
 			case MESSAGE_TYPE_MOUSE_WHEEL:
 				e.modifiers = mmsg->modifiers;
 				e.x = mmsg->x;
 				e.y = mmsg->y;
-				ba->GetBrowser()->GetHost()->SendMouseWheelEvent(e,
-					wmsg->x_delta, wmsg->y_delta);
+				ba->GetBrowser()->GetHost()->SendMouseWheelEvent(e, wmsg->x_delta,
+				                                                 wmsg->y_delta);
 				break;
 			case MESSAGE_TYPE_FOCUS:
 				ba->GetBrowser()->GetHost()->SendFocusEvent(fmsg->focus);
@@ -182,14 +193,21 @@ static void *MessageThread(void *vptr)
 				ba->GetBrowser()->GetHost()->SendKeyEvent(ke);
 				break;
 			case MESSAGE_TYPE_SCROLLBARS:
-				ba->GetClient()->SetScrollbars(ba->GetBrowser(), (bool) msg.data[0]);
+				ba->GetClient()->SetScrollbars(ba->GetBrowser(),
+				                               (bool) msg.data[0]);
 				break;
 			case MESSAGE_TYPE_ZOOM:
 				ba->GetClient()->SetZoom(ba->GetBrowser(), zmsg->zoom);
 				break;
 			case MESSAGE_TYPE_SCROLL:
-				ba->GetClient()->SetScroll(ba->GetBrowser(),
-						smsg->vertical, smsg->horizontal);
+				ba->GetClient()->SetScroll(ba->GetBrowser(), smsg->vertical,
+				                           smsg->horizontal);
+				break;
+			case MESSAGE_TYPE_ACTIVE_STATE_CHANGE:
+				ba->UpdateActiveStateJS(amsg->active);
+				break;
+			case MESSAGE_TYPE_VISIBILITY_CHANGE:
+				ba->UpdateVisibilityStateJS(vmsg->visible);
 				break;
 			case MESSAGE_TYPE_ACTIVE_STATE_CHANGE:
 				ba->UpdateActiveStateJS(amsg->active);
@@ -212,7 +230,7 @@ void BrowserApp::SizeChanged()
 	pthread_mutex_unlock(&data->mutex);
 }
 
-void BrowserApp::UrlChanged(const char *url)
+void BrowserApp::UrlChanged(const char* url)
 {
 	CefString cef_url;
 	cef_url.FromString(std::string(url));
@@ -224,11 +242,11 @@ void BrowserApp::UrlChanged(const char *url)
 	}
 
 	if (strncmp(url, "file:///", strlen("file:///")) == 0) {
-		in_wd = inotify_add_watch(in_fd, url+strlen("file://"), IN_MODIFY);
+		in_wd = inotify_add_watch(in_fd, url + strlen("file://"), IN_MODIFY);
 	}
 }
 
-void BrowserApp::CssChanged(const char *css_file)
+void BrowserApp::CssChanged(const char* css_file)
 {
 	/* read file into string */
 	std::ifstream t(css_file, std::ifstream::in);
@@ -265,8 +283,9 @@ void BrowserApp::OnContextInitialized()
 	CefRefPtr<BrowserClient> client(new BrowserClient(data, css));
 	this->client = client;
 
-	browser = CefBrowserHost::CreateBrowserSync(info, client.get(), "http://google.com", settings, NULL);
-	client->SetScroll(browser, 0, 0);  /* workaround for scroll to bottom bug */
+	browser = CefBrowserHost::CreateBrowserSync(info, client.get(), "http://google.com",
+	                                            settings, NULL);
+	client->SetScroll(browser, 0, 0); /* workaround for scroll to bottom bug */
 
 	pthread_create(&message_thread, NULL, MessageThread, this);
 }
@@ -278,12 +297,15 @@ void BrowserApp::OnContextCreated(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFr
 
 	CefRefPtr<CefV8Value> obsStudioObj = CefV8Value::CreateObject(0, 0);
 	globalObj->SetValue("obsstudio", obsStudioObj, V8_PROPERTY_ATTRIBUTE_NONE);
+<<<<<<< HEAD
 
 	obsStudioObj->SetValue("linuxbrowser", CefV8Value::CreateBool(true),
 		V8_PROPERTY_ATTRIBUTE_NONE);
 
 	obsStudioObj->SetValue("pluginVersion", CefV8Value::CreateString(LINUXBROWSER_VERSION),
 		V8_PROPERTY_ATTRIBUTE_NONE);
+=======
+>>>>>>> master
 }
 
 bool BrowserApp::OnProcessMessageReceived(CefRefPtr<CefBrowser> browser,

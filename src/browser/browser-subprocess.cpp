@@ -18,7 +18,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "browser-app.hpp"
 
-int main(int argc, char* argv[]) {
+int main(int argc, char* argv[])
+{
 	CefMainArgs main_args(argc, argv);
 	CefRefPtr<BrowserApp> app(new BrowserApp(NULL));
 	return CefExecuteProcess(main_args, app.get(), NULL);
