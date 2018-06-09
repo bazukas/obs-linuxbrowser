@@ -53,3 +53,7 @@ All bindings are children of `window.obsstudio`.
 ## Callbacks
 * `onActiveChange(bool isActive)` – called whenever the source becomes activated or deactivated
 * `onVisibilityChange(bool isVisible)` – called whenever the source is shown or hidden
+
+## Constants
+* `linuxbrowser = true` – Indicates obs-linuxbrowser is being used
+* `pluginVersion` – A string containing the plugin's version
