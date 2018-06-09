@@ -399,32 +399,6 @@ static void browser_source_hide(void* vptr)
 	browser_manager_send_visibility_change(data->manager, false);
 }
 
-static void browser_source_activate(void* vptr)
-{
-	reload_on_scene(vptr);
-
-	struct browser_data* data = vptr;
-	browser_manager_send_active_state_change(data->manager, true);
-}
-
-static void browser_source_deactivate(void* vptr)
-{
-	struct browser_data* data = vptr;
-	browser_manager_send_active_state_change(data->manager, false);
-}
-
-static void browser_source_show(void* vptr)
-{
-	struct browser_data* data = vptr;
-	browser_manager_send_visibility_change(data->manager, true);
-}
-
-static void browser_source_hide(void* vptr)
-{
-	struct browser_data* data = vptr;
-	browser_manager_send_visibility_change(data->manager, false);
-}
-
 bool obs_module_load(void)
 {
 	struct obs_source_info info = {};

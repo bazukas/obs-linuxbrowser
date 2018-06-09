@@ -198,12 +198,6 @@ static void* MessageThread(void* vptr)
 			case MESSAGE_TYPE_VISIBILITY_CHANGE:
 				ba->UpdateVisibilityStateJS(vmsg->visible);
 				break;
-			case MESSAGE_TYPE_ACTIVE_STATE_CHANGE:
-				ba->UpdateActiveStateJS(amsg->active);
-				break;
-			case MESSAGE_TYPE_VISIBILITY_CHANGE:
-				ba->UpdateVisibilityStateJS(vmsg->visible);
-				break;
 			}
 		}
 	}
@@ -286,15 +280,12 @@ void BrowserApp::OnContextCreated(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFr
 
 	CefRefPtr<CefV8Value> obsStudioObj = CefV8Value::CreateObject(0, 0);
 	globalObj->SetValue("obsstudio", obsStudioObj, V8_PROPERTY_ATTRIBUTE_NONE);
-<<<<<<< HEAD
 
 	obsStudioObj->SetValue("linuxbrowser", CefV8Value::CreateBool(true),
 	                       V8_PROPERTY_ATTRIBUTE_NONE);
 
 	obsStudioObj->SetValue("pluginVersion", CefV8Value::CreateString(LINUXBROWSER_VERSION),
 	                       V8_PROPERTY_ATTRIBUTE_NONE);
-=======
->>>>>>> master
 }
 
 bool BrowserApp::OnProcessMessageReceived(CefRefPtr<CefBrowser> browser,
