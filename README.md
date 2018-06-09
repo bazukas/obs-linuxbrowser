@@ -58,6 +58,11 @@ All bindings are children of `window.obsstudio`.
 * `onActiveChange(bool isActive)` – called whenever the source becomes activated or deactivated
 * `onVisibilityChange(bool isVisible)` – called whenever the source is shown or hidden
 
+<<<<<<< HEAD
+## Constants
+* `linuxbrowser = true` – Indicates obs-linuxbrowser is being used
+* `pluginVersion` – A string containing the plugin's version
+=======
 # Known issues
 ## Old version of OBS not starting with new version of obs-linuxbrowser installed
 Using obs-linuxbrowser with an older OBS version than the one which has been used for compilation makes OBS break. Compile obs-linuxbrowser with the same OBS version you are going to use for streaming/recording or select a binary release whose OBS version matches the same version as yours.
@@ -66,3 +71,4 @@ Using obs-linuxbrowser with an older OBS version than the one which has been use
 Some builds of CEF seem to be not working with obs-linuxbrowser.
 We weren't able to figure out the exact cause of this, but we assume that it's a CEF-related issue we can't fix.
 Check issue [#63](https://github.com/bazukas/obs-linuxbrowser/issues/63) for information about CEF versions that are known to be working.
+>>>>>>> master

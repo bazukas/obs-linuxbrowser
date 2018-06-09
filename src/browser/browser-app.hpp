@@ -40,6 +40,11 @@ public:
 		return this;
 	}
 
+	virtual CefRefPtr<CefRenderProcessHandler> GetRenderProcessHandler() override
+	{
+		return this;
+	}
+
 	virtual void OnContextInitialized() OVERRIDE;
 
 	int GetQueueId()

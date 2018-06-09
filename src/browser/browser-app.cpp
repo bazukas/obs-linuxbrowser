@@ -24,6 +24,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <fstream>
 
 #include "browser-app.hpp"
+#include "config.h"
 
 /* for signal handling */
 int static_in_fd = 0;
@@ -115,6 +116,16 @@ static void* MessageThread(void* vptr)
 	CefKeyEvent ke;
 
 	struct generic_message msg;
+<<<<<<< HEAD
+	struct text_message *tmsg = (struct text_message *) &msg;
+	struct mouse_click_message *cmsg = (struct mouse_click_message *) &msg;
+	struct mouse_move_message *mmsg = (struct mouse_move_message *) &msg;
+	struct mouse_wheel_message *wmsg = (struct mouse_wheel_message *) &msg;
+	struct focus_message *fmsg = (struct focus_message *) &msg;
+	struct key_message *kmsg = (struct key_message *) &msg;
+	struct zoom_message *zmsg = (struct zoom_message *) &msg;
+	struct scroll_message *smsg = (struct scroll_message *) &msg;
+=======
 	struct text_message* tmsg = (struct text_message*) &msg;
 	struct mouse_click_message* cmsg = (struct mouse_click_message*) &msg;
 	struct mouse_move_message* mmsg = (struct mouse_move_message*) &msg;
@@ -123,6 +134,7 @@ static void* MessageThread(void* vptr)
 	struct key_message* kmsg = (struct key_message*) &msg;
 	struct zoom_message* zmsg = (struct zoom_message*) &msg;
 	struct scroll_message* smsg = (struct scroll_message*) &msg;
+>>>>>>> master
 	struct active_state_message* amsg = (struct active_state_message*) &msg;
 	struct visibility_message* vmsg = (struct visibility_message*) &msg;
 
@@ -190,6 +202,12 @@ static void* MessageThread(void* vptr)
 			case MESSAGE_TYPE_SCROLL:
 				ba->GetClient()->SetScroll(ba->GetBrowser(), smsg->vertical,
 				                           smsg->horizontal);
+				break;
+			case MESSAGE_TYPE_ACTIVE_STATE_CHANGE:
+				ba->UpdateActiveStateJS(amsg->active);
+				break;
+			case MESSAGE_TYPE_VISIBILITY_CHANGE:
+				ba->UpdateVisibilityStateJS(vmsg->visible);
 				break;
 			case MESSAGE_TYPE_ACTIVE_STATE_CHANGE:
 				ba->UpdateActiveStateJS(amsg->active);
@@ -279,6 +297,15 @@ void BrowserApp::OnContextCreated(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFr
 
 	CefRefPtr<CefV8Value> obsStudioObj = CefV8Value::CreateObject(0, 0);
 	globalObj->SetValue("obsstudio", obsStudioObj, V8_PROPERTY_ATTRIBUTE_NONE);
+<<<<<<< HEAD
+
+	obsStudioObj->SetValue("linuxbrowser", CefV8Value::CreateBool(true),
+		V8_PROPERTY_ATTRIBUTE_NONE);
+
+	obsStudioObj->SetValue("pluginVersion", CefV8Value::CreateString(LINUXBROWSER_VERSION),
+		V8_PROPERTY_ATTRIBUTE_NONE);
+=======
+>>>>>>> master
 }
 
 bool BrowserApp::OnProcessMessageReceived(CefRefPtr<CefBrowser> browser,
