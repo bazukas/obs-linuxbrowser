@@ -70,3 +70,22 @@ Using obs-linuxbrowser with an older OBS version than the one which has been use
 Some builds of CEF seem to be not working with obs-linuxbrowser.
 We weren't able to figure out the exact cause of this, but we assume that it's a CEF-related issue we can't fix.
 Check issue [#63](https://github.com/bazukas/obs-linuxbrowser/issues/63) for information about CEF versions that are known to be working.
+
+## Long URLs not working
+Currently, obs-linuxbrowser only supports URLs shorter than 1000 characters.
+You can use a standard URL shortener (e.g. tinyurl) to shorten your URL.
+
+Check issue [#70](https://github.com/bazukas/obs-linuxbrowser/issues/70) to track progress on this bug.
+
+## Transparency not working correctly: Transparent white browser content appears gray on white scene background.
+As stated in issue [#58](https://github.com/bazukas/obs-linuxbrowser/issues/58), there is a limitation in CEF, making it unable to detect the background of the OBS scenes.
+Instead, premultiplied alpha values are used, which somehow make transparent white colors appear gray (every color on the grayscale is a bit darker than normal when using transparency).
+With a black background, transparency seems to be working out quite fine.
+
+This issue cannot be fixed.
+
+## Browser instances always seem active
+The browser instances which obs-linuxbrowser creates to show the websites, are constantly active in the background, even if the source is hidden.
+This is due to the fact, that starting up the browser instance takes way longer than the average time a transition needs to open a scene. Restarting the browser every time the source gets activated wouldn't look very appealing to the viewers. That's why this feature hasn't been implemented yet, but it's work in progress. See [#48](https://github.com/bazukas/obs-linuxbrowser/issues/48).
+
+A workaround is using the JS bindings provided by obs-linuxbrowser. They are partly compatible with those of obs-browser, so using a setup that works on obs-browser should in most cases also work with obs-linuxbrowser.
