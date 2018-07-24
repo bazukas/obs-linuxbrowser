@@ -1,25 +1,33 @@
 # About
 
-This is a browser source plugin for obs-studio (https://github.com/jp9000/obs-studio) based
-on Chromium Embedded Framework (https://bitbucket.org/chromiumembedded/cef). This plugin is Linux only.
+This is a browser source plugin for [obs-studio](https://github.com/jp9000/obs-studio) based
+on [Chromium Embedded Framework](https://bitbucket.org/chromiumembedded/cef). This plugin is Linux only.
 
-Unfortunately, I was not able to make obs-browser (https://github.com/kc5nra/obs-browser) work on Linux,
+Unfortunately, I was not able to make [kc5rna/obs-browser](https://github.com/kc5nra/obs-browser) work on Linux,
 so I decided to create a separate plugin using the same engine, so both plugins should have feature parity in
 terms of browser capabilities.
 
 ![Browser window](img/obs-linuxbrowser.png)
 
+# Dependencies
+
+* OBS-Studio
+* Chromium Embedded Framework minimal or standard release
+* libgconf
+
 # Installing
 
-* Download the latest release from [releases page](https://github.com/bazukas/obs-linuxbrowser/releases). Make sure the release version matches obs-studio version on your system. (Currently 20.0.1 for Ubuntu).
+* Download the latest release from [releases page](https://github.com/bazukas/obs-linuxbrowser/releases). Make sure the release version matches obs-studio version on your system [1].
 * `mkdir -p $HOME/.config/obs-studio/plugins`
-* `tar xfvz linuxbrowser0.3.1-obs20.0.1-64bit.tgz -C $HOME/.config/obs-studio/plugins/`
-* Install the dependencies: libgconf-2-4 (`sudo apt-get install libgconf-2-4` in Ubuntu)
+* `tar xfvz linuxbrowser0.4.0-obs21.1.1-64bit.tgz -C $HOME/.config/obs-studio/plugins/`
+* Install the dependencies (see Dependencies section)
 
 You don't need to build the plugin if you downloaded a binary release, instructions below are for people
 who want to compile the plugin themselves.
 
 Arch Linux users can install obs-linuxbrowser from the official AUR packages [obs-linuxbrowser](https://aur.archlinux.org/packages/obs-linuxbrowser) or [obs-linuxbrowser-bin](https://aur.archlinux.org/packages/obs-linuxbrowser-bin).
+
+[1] Every binary release has the version number of OBS contained as part of the file name, e.g. “linuxbrowser0.4.0-obs21.1.1-64bit.tgz” refers to obs-linuxbrowser version 0.4.0 with OBS version 21.1.1.
 
 # Building
 
@@ -36,20 +44,19 @@ Make sure you have obs-studio installed.
 * `cd obs-linuxbrowser`
 * `mkdir build`
 * `cd build`
-* `cmake -D CEF_DIR=<path to your cef dir> ..` You might need to also set `OBS_INCLUDE` and/or `OBS_LIB`
-build variables
+* `cmake -D CEF_DIR=<path to your cef dir> ..` (You might also need to set `OBS_INCLUDE` and/or `OBS_LIB` build variables to point to your OBS installation's include and library locations repectively. In most cases, this is not necessary.)
 * `make`
 
 ## Installing
 
 * Run `make install` to copy plugin binaries into $HOME/.config/obs-studio/plugins.
-* Make sure libgconf-2-4 dependency installed in your system
+* Make sure to have all dependencies installed on your system
 
 # Flash
 
-You can enable flash by providing path to pepper flash library file and its version.
-Some distributions provide packages with the plugin, or you can extract one from google chrome installation.
-Flash version can be found in manifest.json that is usually found in same directory as .so file.
+You can enable flash by providing the path to your installed pepper flash library file and its version.
+Some distributions provide packages with the plugin, but you can also extract one from google chrome installation.
+The Flash version can be found in manifest.json that is usually found in same directory as .so file.
 
 # JavaScript bindings
 All bindings are children of `window.obsstudio`.
