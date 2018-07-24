@@ -35,6 +35,7 @@ struct browser_data {
 	uint32_t scroll_vertical;
 	uint32_t scroll_horizontal;
 	bool reload_on_scene;
+	bool stop_on_hide;
 
 	/* internal data */
 	obs_source_t* source;
@@ -68,6 +69,7 @@ static void browser_update(void* vptr, obs_data_t* settings)
 	uint32_t scroll_vertical = obs_data_get_int(settings, "scroll_vertical");
 	uint32_t scroll_horizontal = obs_data_get_int(settings, "scroll_horizontal");
 	data->reload_on_scene = obs_data_get_bool(settings, "reload_on_scene");
+	data->stop_on_hide = obs_data_get_bool(settings, "stop_on_hide");
 
 	bool is_local = obs_data_get_bool(settings, "is_local_file");
 	const char* url;
@@ -280,6 +282,7 @@ static obs_properties_t* browser_get_properties(void* vptr)
 
 	obs_properties_add_button(props, "restart", obs_module_text("RestartBrowser"),
 	                          restart_button_clicked);
+	obs_properties_add_bool(props, "stop_on_hide", obs_module_text("StopOnHide"));
 
 	return props;
 }
@@ -391,12 +394,25 @@ static void browser_source_show(void* vptr)
 {
 	struct browser_data* data = vptr;
 	browser_manager_send_visibility_change(data->manager, true);
+
+	if (data->stop_on_hide) {
+		browser_manager_start_browser(data->manager);
+		browser_manager_change_css_file(data->manager, data->css_file);
+		browser_manager_change_url(data->manager, data->url);
+		browser_manager_set_scrollbars(data->manager, !data->hide_scrollbars);
+		browser_manager_set_zoom(data->manager, data->zoom);
+		browser_manager_set_scroll(data->manager, data->scroll_vertical,
+		                           data->scroll_horizontal);
+	}
 }
 
 static void browser_source_hide(void* vptr)
 {
 	struct browser_data* data = vptr;
 	browser_manager_send_visibility_change(data->manager, false);
+
+	if (data->stop_on_hide)
+		browser_manager_stop_browser(data->manager);
 }
 
 bool obs_module_load(void)

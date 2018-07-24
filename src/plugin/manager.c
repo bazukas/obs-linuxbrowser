@@ -43,6 +43,9 @@ char* get_shm_name(const char* uid)
  * browser process */
 static void spawn_renderer(browser_manager_t* manager)
 {
+	if (manager->spawned)
+		return;
+
 	char* bin_dir = bstrdup(obs_get_module_binary_path(obs_current_module()));
 	char* s = strrchr(bin_dir, '/');
 	if (s)
@@ -100,6 +103,8 @@ static void spawn_renderer(browser_manager_t* manager)
 	bfree(flash_path);
 	bfree(flash_version);
 	bfree(renderer);
+
+	manager->spawned = true;
 }
 
 static void kill_renderer(browser_manager_t* manager)
@@ -107,6 +112,7 @@ static void kill_renderer(browser_manager_t* manager)
 	if (manager->pid > 0) {
 		kill(manager->pid, SIGTERM);
 		waitpid(manager->pid, NULL, 0);
+		manager->spawned = false;
 	}
 }
 
@@ -277,6 +283,22 @@ void browser_manager_restart_browser(browser_manager_t* manager)
 	pthread_mutex_lock(&manager->data->mutex);
 	kill_renderer(manager);
 	spawn_renderer(manager);
+	pthread_mutex_unlock(&manager->data->mutex);
+}
+
+void browser_manager_start_browser(browser_manager_t* manager)
+{
+	pthread_mutex_lock(&manager->data->mutex);
+	// TODO Double spawn prevention?
+	spawn_renderer(manager);
+	pthread_mutex_unlock(&manager->data->mutex);
+}
+
+void browser_manager_stop_browser(browser_manager_t* manager)
+{
+	pthread_mutex_lock(&manager->data->mutex);
+	// TODO Double kill prevention?
+	kill_renderer(manager);
 	pthread_mutex_unlock(&manager->data->mutex);
 }
 
