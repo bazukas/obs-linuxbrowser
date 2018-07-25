@@ -12,7 +12,6 @@ terms of browser capabilities.
 # Dependencies
 
 * OBS-Studio
-* Chromium Embedded Framework minimal or standard release
 * libgconf
 
 # Installing
@@ -33,7 +32,7 @@ Arch Linux users can install obs-linuxbrowser from the official AUR packages [ob
 
 ## Building CEF
 
-* Download CEF standard binary release from http://opensource.spotify.com/cefbuilds/index.html
+* Download CEF minimal or standard binary release from http://opensource.spotify.com/cefbuilds/index.html
 * Extract and cd into folder
 * Run `cmake ./ && make libcef_dll_wrapper`
 
