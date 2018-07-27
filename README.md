@@ -77,12 +77,6 @@ Some builds of CEF seem to be not working with obs-linuxbrowser.
 We weren't able to figure out the exact cause of this, but we assume that it's a CEF-related issue we can't fix.
 Check issue [#63](https://github.com/bazukas/obs-linuxbrowser/issues/63) for information about CEF versions that are known to be working.
 
-## Long URLs not working
-Currently, obs-linuxbrowser only supports URLs shorter than 1000 characters.
-You can use a standard URL shortener (e.g. tinyurl) to shorten your URL.
-
-Check issue [#70](https://github.com/bazukas/obs-linuxbrowser/issues/70) to track progress on this bug.
-
 ## Transparency not working correctly: Transparent white browser content appears gray on white scene background.
 As stated in issue [#58](https://github.com/bazukas/obs-linuxbrowser/issues/58), there is a limitation in CEF, making it unable to detect the background of the OBS scenes.
 Instead, premultiplied alpha values are used, which somehow make transparent white colors appear gray (every color on the grayscale is a bit darker than normal when using transparency).

@@ -24,6 +24,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define MAX_BROWSER_HEIGHT 4096
 #define MAX_DATA_SIZE MAX_BROWSER_WIDTH* MAX_BROWSER_HEIGHT * 4
 
+#include <pthread.h>
+#include <stdbool.h>
+#include <stdint.h>
+
 struct shared_data {
 	pthread_mutex_t mutex;
 	int qid;
@@ -48,6 +52,7 @@ struct shared_data {
 #define MESSAGE_TYPE_SCROLL 12
 #define MESSAGE_TYPE_ACTIVE_STATE_CHANGE 13
 #define MESSAGE_TYPE_VISIBILITY_CHANGE 14
+#define MESSAGE_TYPE_URL_LONG 15
 
 struct generic_message {
 	long type;
@@ -57,6 +62,14 @@ struct generic_message {
 struct text_message {
 	long type;
 	char text[MAX_MESSAGE_SIZE];
+};
+
+struct split_text_message {
+	long type;
+	uint8_t id;
+	uint8_t count;
+	uint8_t max;
+	char text[MAX_MESSAGE_SIZE - 3];
 };
 
 struct mouse_click_message {

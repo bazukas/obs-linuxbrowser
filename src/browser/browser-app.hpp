@@ -1,5 +1,6 @@
 /*
 Copyright (C) 2017 by Azat Khasanshin <azat.khasanshin@gmail.com>
+Copyright (C) 2018 by Adrian Schollmeyer <nexadn@yandex.com>
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -16,10 +17,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 #pragma once
 
+#include <string>
+
 #include <include/cef_app.h>
 
 #include "browser-client.hpp"
 #include "shared.h"
+#include "split-message.hpp"
 
 class BrowserApp
         : public CefApp
@@ -52,6 +56,7 @@ public:
 	}
 	void SizeChanged();
 	void UrlChanged(const char* url);
+	void UrlChanged(std::string url);
 	void CssChanged(const char* css_file);
 	void ReloadPage();
 
@@ -98,3 +103,4 @@ private:
 
 	IMPLEMENT_REFCOUNTING(BrowserApp);
 };
+

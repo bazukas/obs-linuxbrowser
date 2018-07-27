@@ -49,6 +49,7 @@ set(BROWSER_SHARED_SOURCES
     src/browser/base64.cpp
     src/browser/browser-app.cpp
     src/browser/browser-client.cpp
+    src/browser/split-message.cpp
 )
 set(BROWSER_SOURCES
     ${BROWSER_SHARED_SOURCES}

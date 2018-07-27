@@ -16,6 +16,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include <fcntl.h>
+#include <math.h>
 #include <pthread.h>
 #include <signal.h>
 #include <stdio.h>
@@ -192,11 +193,28 @@ void browser_manager_change_url(browser_manager_t* manager, const char* url)
 	if (manager->qid == -1)
 		return;
 
-	struct text_message buf;
-	buf.type = MESSAGE_TYPE_URL;
-	strncpy(buf.text, url, MAX_MESSAGE_SIZE);
+	if (strlen(url) < MAX_MESSAGE_SIZE) {
+		struct text_message buf;
+		buf.type = MESSAGE_TYPE_URL;
+		strncpy(buf.text, url, MAX_MESSAGE_SIZE);
 
-	msgsnd(manager->qid, &buf, strlen(url) + 1, 0);
+		msgsnd(manager->qid, &buf, strlen(url) + 1, 0);
+	} else {
+		uint packages = ceil((double) strlen(url) / (double) (MAX_MESSAGE_SIZE - 3));
+
+		static uint8_t split_id = 0;
+		split_id++;
+		for (uint i = 0; i < packages; i++) {
+			struct split_text_message buf;
+			buf.id = split_id;
+			buf.count = i;
+			buf.max = packages;
+			buf.type = MESSAGE_TYPE_URL_LONG;
+
+			strncpy(buf.text, &url[i * (MAX_MESSAGE_SIZE - 3)], MAX_MESSAGE_SIZE - 3);
+			msgsnd(manager->qid, &buf, strlen(buf.text) + 3, 0);
+		}
+	}
 }
 
 void browser_manager_change_css_file(browser_manager_t* manager, const char* css_file)
