@@ -36,7 +36,6 @@ public:
 
 private:
 	std::map<uint8_t, std::string> messages;
-	uint8_t progress;
 
 	const uint8_t id;
 	const uint8_t size;

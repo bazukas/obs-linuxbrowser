@@ -34,6 +34,5 @@ void SplitMessage::addMessage(const split_text_message& msg)
 	// Only insert message if the id and size match; else silent fail
 	if (msg.id == this->id && msg.max == this->size) {
 		this->messages.insert({msg.count, std::string{msg.text}});
-		this->progress++;
 	}
 }
