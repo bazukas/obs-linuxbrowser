@@ -1,5 +1,6 @@
 /*
 Copyright (C) 2017 by Azat Khasanshin <azat.khasanshin@gmail.com>
+Copyright (C) 2018 by Adrian Schollmeyer <nexadn@yandex.com>
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -22,6 +23,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <unistd.h>
 
 #include <fstream>
+#include <unordered_map>
 
 #include "browser-app.hpp"
 #include "config.h"
@@ -109,6 +111,7 @@ void BrowserApp::UninitSharedData()
 /* message receiver thread */
 static void* MessageThread(void* vptr)
 {
+	std::unordered_map<uint8_t, SplitMessage*> splitMessages;
 	BrowserApp* ba = (BrowserApp*) vptr;
 	size_t max_buf_size = MAX_MESSAGE_SIZE;
 	ssize_t received;
@@ -117,6 +120,7 @@ static void* MessageThread(void* vptr)
 
 	struct generic_message msg;
 	struct text_message* tmsg = (struct text_message*) &msg;
+	struct split_text_message* sptmsg = (struct split_text_message*) &msg;
 	struct mouse_click_message* cmsg = (struct mouse_click_message*) &msg;
 	struct mouse_move_message* mmsg = (struct mouse_move_message*) &msg;
 	struct mouse_wheel_message* wmsg = (struct mouse_wheel_message*) &msg;
@@ -133,6 +137,20 @@ static void* MessageThread(void* vptr)
 			switch (msg.type) {
 			case MESSAGE_TYPE_URL:
 				ba->UrlChanged(tmsg->text);
+				break;
+			case MESSAGE_TYPE_URL_LONG:
+
+				if (splitMessages.count(sptmsg->id) <= 0) {
+					splitMessages.insert(
+					    {sptmsg->id,
+					     new SplitMessage(sptmsg->id, sptmsg->max)});
+				}
+
+				splitMessages.at(sptmsg->id)->addMessage(*sptmsg);
+
+				if (splitMessages.at(sptmsg->id)->dataIsReady()) {
+					ba->UrlChanged(splitMessages.at(sptmsg->id)->getData());
+				}
 				break;
 			case MESSAGE_TYPE_SIZE:
 				ba->SizeChanged();
@@ -215,8 +233,13 @@ void BrowserApp::SizeChanged()
 
 void BrowserApp::UrlChanged(const char* url)
 {
+	this->UrlChanged(std::string(url));
+}
+
+void BrowserApp::UrlChanged(std::string url)
+{
 	CefString cef_url;
-	cef_url.FromString(std::string(url));
+	cef_url.FromString(url);
 	browser->GetMainFrame()->LoadURL(cef_url);
 
 	if (in_wd >= 0) {
@@ -224,8 +247,8 @@ void BrowserApp::UrlChanged(const char* url)
 		in_wd = -1;
 	}
 
-	if (strncmp(url, "file:///", strlen("file:///")) == 0) {
-		in_wd = inotify_add_watch(in_fd, url + strlen("file://"), IN_MODIFY);
+	if (strncmp(url.c_str(), "file:///", strlen("file:///")) == 0) {
+		in_wd = inotify_add_watch(in_fd, url.c_str() + strlen("file://"), IN_MODIFY);
 	}
 }
 
