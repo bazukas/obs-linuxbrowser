@@ -83,9 +83,3 @@ Instead, premultiplied alpha values are used, which somehow make transparent whi
 With a black background, transparency seems to be working out quite fine.
 
 This issue cannot be fixed.
-
-## Browser instances always seem active
-The browser instances which obs-linuxbrowser creates to show the websites, are constantly active in the background, even if the source is hidden.
-This is due to the fact, that starting up the browser instance takes way longer than the average time a transition needs to open a scene. Restarting the browser every time the source gets activated wouldn't look very appealing to the viewers. That's why this feature hasn't been implemented yet, but it's work in progress. See [#48](https://github.com/bazukas/obs-linuxbrowser/issues/48).
-
-A workaround is using the JS bindings provided by obs-linuxbrowser. They are partly compatible with those of obs-browser, so using a setup that works on obs-browser should in most cases also work with obs-linuxbrowser.
