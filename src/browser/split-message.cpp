@@ -1,6 +1,6 @@
 #include "split-message.hpp"
 
-SplitMessage::SplitMessage(const uint8_t id, const uint8_t size) : id(id), size(size), progress(0)
+SplitMessage::SplitMessage(const uint8_t id, const uint8_t size) : id(id), size(size)
 {}
 
 SplitMessage::~SplitMessage()
