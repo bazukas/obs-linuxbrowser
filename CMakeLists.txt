@@ -2,7 +2,7 @@ cmake_minimum_required (VERSION 2.8)
 project (obs-linuxbrowser)
 set(CMAKE_BUILD_TYPE Release)
 
-set(LINUXBROWSER_VERSION 0.4.0)
+set(LINUXBROWSER_VERSION 0.4.1)
 
 set(OBS_INCLUDE "/usr/include/obs" CACHE PATH "OBS Include Dir")
 set(OBS_LIB "/usr/lib" CACHE PATH "OBS Lib Dir")
