@@ -206,11 +206,11 @@ void browser_manager_change_url(browser_manager_t* manager, const char* url)
 
 		msgsnd(manager->qid, &buf, strlen(url) + 1, 0);
 	} else {
-		uint packages = ceil((double) strlen(url) / (double) (MAX_MESSAGE_SIZE - 3));
+		uint8_t packages = ceil((double) strlen(url) / (double) (MAX_MESSAGE_SIZE - 3));
 
 		static uint8_t split_id = 0;
 		split_id++;
-		for (uint i = 0; i < packages; i++) {
+		for (uint8_t i = 0; i < packages; i++) {
 			struct split_text_message buf;
 			buf.id = split_id;
 			buf.count = i;
