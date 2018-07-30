@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <sys/prctl.h>
 #include <unistd.h>
 
-#include <include/cef_app.h>
+#include <cef_app.h>
 
 #include "browser-app.hpp"
 
@@ -52,6 +52,5 @@ int main(int argc, char* argv[])
 	CefInitialize(main_args, settings, app.get(), NULL);
 	CefRunMessageLoop();
 	CefShutdown();
-
 	return 0;
 }

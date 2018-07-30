@@ -16,7 +16,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 #pragma once
 
-#include <include/cef_client.h>
+#include <cef_client.h>
 
 #include "shared.h"
 

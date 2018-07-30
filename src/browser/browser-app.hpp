@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <string>
 
-#include <include/cef_app.h>
+#include <cef_app.h>
 
 #include "browser-client.hpp"
 #include "shared.h"
@@ -103,4 +103,3 @@ private:
 
 	IMPLEMENT_REFCOUNTING(BrowserApp);
 };
-
