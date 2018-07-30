@@ -18,6 +18,8 @@ find_library(OBS_LIBRARY
     NAMES
     obs
     "OBS Studio"
+    HINTS
+    "${OBS_LIBRARY_SEARCH_DIR}"
     PATHS
     "${OBS_ROOT_DIR}"
     PATH_SUFFIXES
@@ -28,6 +30,8 @@ find_path(OBS_INCLUDE_DIR
     NAMES
     obs.h obs.hpp
     "OBS Studio"
+    HINTS
+    "${OBS_INCLUDE_SEARCH_DIR}"
     PATHS
     "${OBS_ROOT_DIR}"
     "/usr"
