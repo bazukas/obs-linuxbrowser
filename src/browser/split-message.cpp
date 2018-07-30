@@ -29,10 +29,10 @@ bool SplitMessage::dataIsReady() const
 	return true;
 }
 
-void SplitMessage::addMessage(const split_text_message& msg)
+void SplitMessage::addMessage(const browser_message_t& msg)
 {
 	// Only insert message if the id and size match; else silent fail
-	if (msg.id == this->id && msg.max == this->size) {
-		this->messages.insert({msg.count, std::string{msg.text}});
+	if (msg.split_text.id == this->id && msg.split_text.max == this->size) {
+		this->messages.insert({msg.split_text.count, std::string{msg.split_text.text}});
 	}
 }

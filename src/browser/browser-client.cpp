@@ -21,7 +21,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "base64.hpp"
 #include "browser-client.hpp"
 
-BrowserClient::BrowserClient(struct shared_data* data, std::string css)
+BrowserClient::BrowserClient(shared_data_t* data, std::string css)
 {
 	this->data = data;
 	this->css = css;
@@ -39,7 +39,7 @@ void BrowserClient::OnPaint(CefRefPtr<CefBrowser> browser, CefRenderHandler::Pai
                             const CefRenderHandler::RectList& dirtyRects, const void* buffer,
                             int vwidth, int vheight)
 {
-	/* don't draw popups for now */
+	// Don't draw popups for now
 	if (type == PET_VIEW) {
 		pthread_mutex_lock(&data->mutex);
 		size_t len = std::min(vwidth * vheight * 4, int(data->width * data->height * 4));

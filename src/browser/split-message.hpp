@@ -32,7 +32,7 @@ public:
 	std::string getData() const;
 	bool dataIsReady() const;
 
-	void addMessage(const split_text_message& msg);
+	void addMessage(const browser_message_t& msg);
 
 private:
 	std::map<uint8_t, std::string> messages;

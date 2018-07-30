@@ -31,15 +31,15 @@ int main(int argc, char* argv[])
 	prctl(PR_SET_PDEATHSIG, SIGTERM);
 
 	/* different path settings for cef */
-	std::string data_dir(argv[1]);
-	std::string resources_dir = data_dir + "/cef";
-	std::string locales_dir = resources_dir + "/locales";
-	std::string home_dir = getpwuid(getuid())->pw_dir;
-	std::string cache_dir = home_dir + "/.cache/obs-linuxbrowser/" + std::string(argv[2]);
-	std::string subprocess_path = std::string(argv[0]) + "-subprocess";
+	std::string data_dir{argv[1]};
+	std::string resources_dir{data_dir + "/cef"};
+	std::string locales_dir{resources_dir + "/locales"};
+	std::string home_dir{getpwuid(getuid())->pw_dir};
+	std::string cache_dir{home_dir + "/.cache/obs-linuxbrowser/" + std::string{argv[2]}};
+	std::string subprocess_path{std::string{argv[0]} + "-subprocess"};
 
-	CefRefPtr<BrowserApp> app(new BrowserApp(argv[2]));
-	CefMainArgs main_args(argc, argv);
+	CefRefPtr<BrowserApp> app{new BrowserApp(argv[2])};
+	CefMainArgs main_args{argc, argv};
 
 	CefSettings settings;
 	CefString(&settings.browser_subprocess_path).FromString(subprocess_path);
@@ -49,7 +49,7 @@ int main(int argc, char* argv[])
 	settings.no_sandbox = true;
 	settings.windowless_rendering_enabled = true;
 
-	CefInitialize(main_args, settings, app.get(), NULL);
+	CefInitialize(main_args, settings, app.get(), nullptr);
 	CefRunMessageLoop();
 	CefShutdown();
 	return 0;

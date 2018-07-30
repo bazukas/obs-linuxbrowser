@@ -28,14 +28,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <stdbool.h>
 #include <stdint.h>
 
-struct shared_data {
+typedef struct shared_data {
 	pthread_mutex_t mutex;
 	int qid;
 	int fps;
 	uint32_t width;
 	uint32_t height;
 	uint8_t data;
-};
+} shared_data_t;
 
 #define MAX_MESSAGE_SIZE 1024
 #define MESSAGE_TYPE_URL 1
@@ -54,81 +54,167 @@ struct shared_data {
 #define MESSAGE_TYPE_VISIBILITY_CHANGE 14
 #define MESSAGE_TYPE_URL_LONG 15
 
-struct generic_message {
-	long type;
-	uint8_t data[MAX_MESSAGE_SIZE];
-};
+typedef union {
+	struct {
+		long type;
+		uint8_t data[MAX_MESSAGE_SIZE];
+	} generic;
 
-struct text_message {
-	long type;
-	char text[MAX_MESSAGE_SIZE];
-};
+	struct {
+		long type;
+		bool state;
+	} generic_state;
 
-struct split_text_message {
-	long type;
-	uint8_t id;
-	uint8_t count;
-	uint8_t max;
-	char text[MAX_MESSAGE_SIZE - 3];
-};
+	struct {
+		long type;
+		char text[MAX_MESSAGE_SIZE];
+	} text;
 
-struct mouse_click_message {
-	long type;
-	int32_t x;
-	int32_t y;
-	uint32_t modifiers;
-	int32_t button_type;
-	bool mouse_up;
-	uint32_t click_count;
-};
+	struct {
+		long type;
+		uint8_t id;
+		uint8_t count;
+		uint8_t max;
+		char text[MAX_MESSAGE_SIZE - 3];
+	} split_text;
 
-struct mouse_move_message {
-	long type;
-	int32_t x;
-	int32_t y;
-	uint32_t modifiers;
-	bool mouse_leave;
-};
+	struct {
+		long type;
+		int32_t x;
+		int32_t y;
+		uint32_t modifiers;
+		int32_t button_type;
+		bool mouse_up;
+		uint32_t click_count;
+	} mouse_click;
 
-struct mouse_wheel_message {
-	long type;
-	int32_t x;
-	int32_t y;
-	uint32_t modifiers;
-	int x_delta;
-	int y_delta;
-};
+	struct {
+		long type;
+		int32_t x;
+		int32_t y;
+		uint32_t modifiers;
+		bool mouse_leave;
+	} mouse_move;
 
-struct focus_message {
-	long type;
-	bool focus;
-};
+	struct {
+		long type;
+		int32_t x;
+		int32_t y;
+		uint32_t modifiers;
+		int x_delta;
+		int y_delta;
+	} mouse_wheel;
 
-struct key_message {
-	long type;
-	bool key_up;
-	uint32_t native_vkey;
-	uint32_t modifiers;
-	char chr;
-};
+	struct {
+		long type;
+		bool focus;
+	} focus;
 
-struct zoom_message {
-	long type;
-	uint32_t zoom;
-};
+	struct {
+		long type;
+		bool key_up;
+		uint32_t native_vkey;
+		uint32_t modifiers;
+		char chr;
+	} key;
 
-struct scroll_message {
-	long type;
-	uint32_t vertical;
-	uint32_t horizontal;
-};
+	struct {
+		long type;
+		uint32_t zoom;
+	} zoom;
 
-struct active_state_message {
-	long type;
-	bool active;
-};
+	struct {
+		long type;
+		uint32_t vertical;
+		uint32_t horizontal;
+	} scroll;
 
-struct visibility_message {
-	long type;
-	bool visible;
-};
+	struct {
+		long type;
+		bool active;
+	} active_state;
+
+	struct {
+		long type;
+		bool visible;
+	} visibility;
+} browser_message_t;
+
+// struct generic_message {
+// 	long type;
+// 	uint8_t data[MAX_MESSAGE_SIZE];
+// };
+//
+// struct text_message {
+// 	long type;
+// 	char text[MAX_MESSAGE_SIZE];
+// };
+//
+// struct split_text_message {
+// 	long type;
+// 	uint8_t id;
+// 	uint8_t count;
+// 	uint8_t max;
+// 	char text[MAX_MESSAGE_SIZE - 3];
+// };
+//
+// struct mouse_click_message {
+// 	long type;
+// 	int32_t x;
+// 	int32_t y;
+// 	uint32_t modifiers;
+// 	int32_t button_type;
+// 	bool mouse_up;
+// 	uint32_t click_count;
+// };
+//
+// struct mouse_move_message {
+// 	long type;
+// 	int32_t x;
+// 	int32_t y;
+// 	uint32_t modifiers;
+// 	bool mouse_leave;
+// };
+//
+// struct mouse_wheel_message {
+// 	long type;
+// 	int32_t x;
+// 	int32_t y;
+// 	uint32_t modifiers;
+// 	int x_delta;
+// 	int y_delta;
+// };
+//
+// struct focus_message {
+// 	long type;
+// 	bool focus;
+// };
+//
+// struct key_message {
+// 	long type;
+// 	bool key_up;
+// 	uint32_t native_vkey;
+// 	uint32_t modifiers;
+// 	char chr;
+// };
+//
+// struct zoom_message {
+// 	long type;
+// 	uint32_t zoom;
+// };
+//
+// struct scroll_message {
+// 	long type;
+// 	uint32_t vertical;
+// 	uint32_t horizontal;
+// };
+//
+// struct active_state_message {
+// 	long type;
+// 	bool active;
+// };
+//
+// struct visibility_message {
+// 	long type;
+// 	bool visible;
+// };

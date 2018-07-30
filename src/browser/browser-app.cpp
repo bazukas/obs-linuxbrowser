@@ -23,6 +23,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <unistd.h>
 
 #include <fstream>
+#include <iostream>
 #include <unordered_map>
 
 #include "browser-app.hpp"
@@ -30,30 +31,33 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 /* for signal handling */
 int static_in_fd = 0;
-BrowserApp* ba = NULL;
-static void file_changed(int signum)
+BrowserApp* ba = nullptr;
+namespace
 {
-	struct inotify_event event;
+void file_changed(int signum)
+{
+	inotify_event event;
 
 	if (static_in_fd != 0 && ba != NULL) {
-		(void) (read(static_in_fd, (void*) &event, sizeof(struct inotify_event)) + 1);
+		read(static_in_fd, (void*) &event, sizeof(inotify_event));
 		ba->ReloadPage();
 	}
 }
+} // namespace
 
 BrowserApp::BrowserApp(char* shmname)
 {
-	if (shmname != NULL && strncmp(shmname, SHM_NAME, strlen(SHM_NAME)) == 0) {
-		shm_name = strdup(shmname);
+	if (shmname != nullptr && shmname == SHM_NAME) {
+		shm_name = shmname;
 
-		/* init inotify */
+		// init inotify
 		in_fd = inotify_init1(IN_NONBLOCK);
 		fcntl(in_fd, F_SETFL, O_ASYNC);
 		fcntl(in_fd, F_SETOWN, getpid());
 		struct sigaction action;
 		memset(&action, 0, sizeof(struct sigaction));
 		action.sa_handler = file_changed;
-		sigaction(SIGIO, &action, NULL);
+		sigaction(SIGIO, &action, nullptr);
 		static_in_fd = in_fd;
 		ba = this;
 
@@ -64,25 +68,23 @@ BrowserApp::BrowserApp(char* shmname)
 BrowserApp::~BrowserApp()
 {
 	UninitSharedData();
-	if (shm_name)
-		free(shm_name);
 	if (in_fd)
 		close(in_fd);
 }
 
-/* open shared memory and read initial data */
+// Open shared memory and read initial data
 void BrowserApp::InitSharedData()
 {
-	fd = shm_open(shm_name, O_RDWR, S_IRUSR | S_IWUSR);
+	fd = shm_open(shm_name.c_str(), O_RDWR, S_IRUSR | S_IWUSR);
 	if (fd == -1) {
-		printf("Browser: shared memory open failed\n");
+		std::cerr << "Browser: shared memory open failed\n";
 		return;
 	}
-	data = (struct shared_data*) mmap(NULL, sizeof(struct shared_data), PROT_READ | PROT_WRITE,
-	                                  MAP_SHARED, fd, 0);
+	data = reinterpret_cast<shared_data*>(
+	    mmap(nullptr, sizeof(shared_data), PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0));
 
 	if (data == MAP_FAILED) {
-		printf("Browser: data mapping failed\n");
+		std::cerr << "Browser: data mapping failed\n";
 		return;
 	}
 
@@ -93,10 +95,10 @@ void BrowserApp::InitSharedData()
 	fps = data->fps;
 	pthread_mutex_unlock(&data->mutex);
 
-	data = (struct shared_data*) mmap(NULL, sizeof(struct shared_data) + MAX_DATA_SIZE,
-	                                  PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+	data = reinterpret_cast<shared_data*>(mmap(NULL, sizeof(shared_data) + MAX_DATA_SIZE,
+	                                           PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0));
 	if (data == MAP_FAILED) {
-		printf("Browser: data remapping failed\n");
+		std::cerr << "Browser: data remapping failed\n";
 		return;
 	}
 }
@@ -104,117 +106,111 @@ void BrowserApp::InitSharedData()
 void BrowserApp::UninitSharedData()
 {
 	if (data && data != MAP_FAILED) {
-		munmap(data, sizeof(struct shared_data) + MAX_DATA_SIZE);
+		munmap(data, sizeof(shared_data) + MAX_DATA_SIZE);
 	}
 }
 
-/* message receiver thread */
-static void* MessageThread(void* vptr)
+// Message receiver loop
+void BrowserApp::MessageThreadWorker()
 {
 	std::unordered_map<uint8_t, SplitMessage*> splitMessages;
-	BrowserApp* ba = (BrowserApp*) vptr;
 	size_t max_buf_size = MAX_MESSAGE_SIZE;
 	ssize_t received;
 	CefMouseEvent e;
 	CefKeyEvent ke;
 
-	struct generic_message msg;
-	struct text_message* tmsg = (struct text_message*) &msg;
-	struct split_text_message* sptmsg = (struct split_text_message*) &msg;
-	struct mouse_click_message* cmsg = (struct mouse_click_message*) &msg;
-	struct mouse_move_message* mmsg = (struct mouse_move_message*) &msg;
-	struct mouse_wheel_message* wmsg = (struct mouse_wheel_message*) &msg;
-	struct focus_message* fmsg = (struct focus_message*) &msg;
-	struct key_message* kmsg = (struct key_message*) &msg;
-	struct zoom_message* zmsg = (struct zoom_message*) &msg;
-	struct scroll_message* smsg = (struct scroll_message*) &msg;
-	struct active_state_message* amsg = (struct active_state_message*) &msg;
-	struct visibility_message* vmsg = (struct visibility_message*) &msg;
+	browser_message_t msg;
 
 	while (true) {
-		received = msgrcv(ba->GetQueueId(), &msg, max_buf_size, 0, MSG_NOERROR);
+		received = msgrcv(this->GetQueueId(), &msg, max_buf_size, 0, MSG_NOERROR);
 		if (received != -1) {
-			switch (msg.type) {
+			switch (msg.generic.type) {
 			case MESSAGE_TYPE_URL:
-				ba->UrlChanged(tmsg->text);
+				this->UrlChanged(msg.text.text);
 				break;
 			case MESSAGE_TYPE_URL_LONG:
 
-				if (splitMessages.count(sptmsg->id) <= 0) {
+				if (splitMessages.count(msg.split_text.id) <= 0) {
 					splitMessages.insert(
-					    {sptmsg->id,
-					     new SplitMessage(sptmsg->id, sptmsg->max)});
+					    {msg.split_text.id,
+					     new SplitMessage(msg.split_text.id,
+					                      msg.split_text.max)});
 				}
 
-				splitMessages.at(sptmsg->id)->addMessage(*sptmsg);
+				splitMessages.at(msg.split_text.id)->addMessage(msg);
 
-				if (splitMessages.at(sptmsg->id)->dataIsReady()) {
-					ba->UrlChanged(splitMessages.at(sptmsg->id)->getData());
+				if (splitMessages.at(msg.split_text.id)->dataIsReady()) {
+					this->UrlChanged(
+					    splitMessages.at(msg.split_text.id)->getData());
+					delete splitMessages.at(msg.split_text.id);
+					splitMessages.erase(msg.split_text.id);
 				}
 				break;
 			case MESSAGE_TYPE_SIZE:
-				ba->SizeChanged();
+				this->SizeChanged();
 				break;
 			case MESSAGE_TYPE_RELOAD:
-				ba->ReloadPage();
+				this->ReloadPage();
 				break;
 			case MESSAGE_TYPE_CSS:
-				ba->CssChanged(tmsg->text);
+				this->CssChanged(msg.text.text);
 				break;
 			case MESSAGE_TYPE_MOUSE_CLICK:
-				e.modifiers = cmsg->modifiers;
-				e.x = cmsg->x;
-				e.y = cmsg->y;
-				ba->GetBrowser()->GetHost()->SendMouseClickEvent(
-				    e, (CefBrowserHost::MouseButtonType) cmsg->button_type,
-				    cmsg->mouse_up, cmsg->click_count);
+				e.modifiers = msg.mouse_click.modifiers;
+				e.x = msg.mouse_click.x;
+				e.y = msg.mouse_click.y;
+				this->GetBrowser()->GetHost()->SendMouseClickEvent(
+				    e,
+				    static_cast<CefBrowserHost::MouseButtonType>(
+				        msg.mouse_click.button_type),
+				    msg.mouse_click.mouse_up, msg.mouse_click.click_count);
 				break;
 			case MESSAGE_TYPE_MOUSE_MOVE:
-				e.modifiers = mmsg->modifiers;
-				e.x = mmsg->x;
-				e.y = mmsg->y;
-				ba->GetBrowser()->GetHost()->SendMouseMoveEvent(e,
-				                                                mmsg->mouse_leave);
+				e.modifiers = msg.mouse_move.modifiers;
+				e.x = msg.mouse_move.x;
+				e.y = msg.mouse_move.y;
+				this->GetBrowser()->GetHost()->SendMouseMoveEvent(
+				    e, msg.mouse_move.mouse_leave);
 				break;
 			case MESSAGE_TYPE_MOUSE_WHEEL:
-				e.modifiers = mmsg->modifiers;
-				e.x = mmsg->x;
-				e.y = mmsg->y;
-				ba->GetBrowser()->GetHost()->SendMouseWheelEvent(e, wmsg->x_delta,
-				                                                 wmsg->y_delta);
+				e.modifiers = msg.mouse_wheel.modifiers;
+				e.x = msg.mouse_wheel.x;
+				e.y = msg.mouse_wheel.y;
+				this->GetBrowser()->GetHost()->SendMouseWheelEvent(
+				    e, msg.mouse_wheel.x_delta, msg.mouse_wheel.y_delta);
 				break;
 			case MESSAGE_TYPE_FOCUS:
-				ba->GetBrowser()->GetHost()->SendFocusEvent(fmsg->focus);
+				this->GetBrowser()->GetHost()->SendFocusEvent(msg.focus.focus);
 				break;
 			case MESSAGE_TYPE_KEY:
 				/* I have no idea what is happening */
-				ke.windows_key_code = kmsg->native_vkey;
-				ke.native_key_code = kmsg->native_vkey;
-				ke.modifiers = kmsg->modifiers;
-				ke.type = kmsg->key_up ? KEYEVENT_KEYUP : KEYEVENT_RAWKEYDOWN;
-				if (kmsg->chr != 0) {
-					ke.character = kmsg->chr;
-					if (!kmsg->key_up)
+				ke.windows_key_code = msg.key.native_vkey;
+				ke.native_key_code = msg.key.native_vkey;
+				ke.modifiers = msg.key.modifiers;
+				ke.type = msg.key.key_up ? KEYEVENT_KEYUP : KEYEVENT_RAWKEYDOWN;
+				if (msg.key.chr != 0) {
+					ke.character = msg.key.chr;
+					if (!msg.key.key_up)
 						ke.type = KEYEVENT_CHAR;
 				}
-				ba->GetBrowser()->GetHost()->SendKeyEvent(ke);
+				this->GetBrowser()->GetHost()->SendKeyEvent(ke);
 				break;
 			case MESSAGE_TYPE_SCROLLBARS:
-				ba->GetClient()->SetScrollbars(ba->GetBrowser(),
-				                               (bool) msg.data[0]);
+				this->GetClient()->SetScrollbars(this->GetBrowser(),
+				                                 msg.generic_state.state);
 				break;
 			case MESSAGE_TYPE_ZOOM:
-				ba->GetClient()->SetZoom(ba->GetBrowser(), zmsg->zoom);
+				this->GetClient()->SetZoom(this->GetBrowser(), msg.zoom.zoom);
 				break;
 			case MESSAGE_TYPE_SCROLL:
-				ba->GetClient()->SetScroll(ba->GetBrowser(), smsg->vertical,
-				                           smsg->horizontal);
+				this->GetClient()->SetScroll(
+				    this->GetBrowser(), msg.scroll.vertical, msg.scroll.horizontal);
 				break;
 			case MESSAGE_TYPE_ACTIVE_STATE_CHANGE:
-				ba->UpdateActiveStateJS(amsg->active);
+				this->UpdateActiveStateJS(msg.active_state.active);
 				break;
 			case MESSAGE_TYPE_VISIBILITY_CHANGE:
-				ba->UpdateVisibilityStateJS(vmsg->visible);
+				this->UpdateVisibilityStateJS(msg.visibility.visible);
 				break;
 			}
 		}
@@ -247,15 +243,14 @@ void BrowserApp::UrlChanged(std::string url)
 		in_wd = -1;
 	}
 
-	if (strncmp(url.c_str(), "file:///", strlen("file:///")) == 0) {
-		in_wd = inotify_add_watch(in_fd, url.c_str() + strlen("file://"), IN_MODIFY);
+	if (url.substr(0, 8) == "file:///") {
+		in_wd = inotify_add_watch(in_fd, url.substr(8).c_str(), IN_MODIFY);
 	}
 }
 
 void BrowserApp::CssChanged(const char* css_file)
 {
-	/* read file into string */
-	std::ifstream t(css_file, std::ifstream::in);
+	std::ifstream t{css_file, std::ifstream::in};
 	if (t.good()) {
 		std::stringstream buffer;
 		buffer << t.rdbuf();
@@ -272,10 +267,10 @@ void BrowserApp::ReloadPage()
 	browser->ReloadIgnoreCache();
 }
 
-/* browser instance created in this callback */
+// Browser instance is being initialized here
 void BrowserApp::OnContextInitialized()
 {
-	if (!shm_name)
+	if (shm_name.empty())
 		return;
 
 	CefWindowInfo info;
@@ -289,11 +284,12 @@ void BrowserApp::OnContextInitialized()
 	CefRefPtr<BrowserClient> client(new BrowserClient(data, css));
 	this->client = client;
 
-	browser = CefBrowserHost::CreateBrowserSync(info, client.get(), "http://google.com",
-	                                            settings, NULL);
-	client->SetScroll(browser, 0, 0); /* workaround for scroll to bottom bug */
+	browser = CefBrowserHost::CreateBrowserSync(
+	    info, client.get(), "https://github.com/bazukas/obs-linuxbrowser/", settings, nullptr);
+	client->SetScroll(browser, 0, 0); // workaround for scroll to bottom bug
 
-	pthread_create(&message_thread, NULL, MessageThread, this);
+	// pthread_create(&message_thread, nullptr, MessageThread, this);
+	messageThread = std::thread{[this] { this->MessageThreadWorker(); }};
 }
 
 void BrowserApp::OnContextCreated(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame,
@@ -344,7 +340,7 @@ void BrowserApp::ExecuteJSFunction(CefRefPtr<CefBrowser> browser, const char* fu
 	CefRefPtr<CefV8Value> jsFunction = obsStudioObj->GetValue(functionName);
 
 	if (jsFunction && jsFunction->IsFunction()) {
-		jsFunction->ExecuteFunction(NULL, arguments);
+		jsFunction->ExecuteFunction(nullptr, arguments);
 	}
 
 	context->Exit();
