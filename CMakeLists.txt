@@ -5,7 +5,12 @@ set(CMAKE_BUILD_TYPE Release CACHE STRING "CMake build type")
 
 set(INSTALL_SYSTEMWIDE false CACHE BOOL "Install to system wide OBS directories instead of local ones")
 
-if (NOT ${INSTALL_SYSTEMWIDE})
+if (${INSTALL_SYSTEMWIDE})
+    set(CMAKE_INSTALL_PREFIX "/usr" CACHE PATH "Installation prefix")
+    if (CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
+        set(CMAKE_INSTALL_PREFIX "/usr" CACHE PATH "Installation prefix" FORCE)
+    endif()
+else()
     set(CMAKE_INSTALL_PREFIX "$ENV{HOME}" CACHE PATH "Installation prefix")
     if (CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
         set(CMAKE_INSTALL_PREFIX "$ENV{HOME}" CACHE PATH "Installation prefix" FORCE)
