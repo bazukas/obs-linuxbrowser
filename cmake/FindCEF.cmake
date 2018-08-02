@@ -82,7 +82,7 @@ find_path(CEF_RESOURCE_DIR
 )
 
 if(NOT CEF_LIBRARY)
-    message(WARNING "Could not find the CEF shared library" )
+    message(FATAL_ERROR "Could not find the CEF shared library" )
     set(CEF_FOUND false)
     return()
 endif()
@@ -90,7 +90,7 @@ endif()
 get_filename_component(CEF_LIBRARY_PATH ${CEF_LIBRARY} PATH)
 
 if(NOT CEFWRAPPER_LIBRARY)
-    message(WARNING "Could not find the CEF wrapper library" )
+    message(FATAL_ERROR "Could not find the CEF wrapper library" )
     set(CEF_FOUND false)
     return()
 endif()
