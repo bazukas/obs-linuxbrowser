@@ -1,4 +1,4 @@
-cmake_minimum_required (VERSION 3.5)
+cmake_minimum_required (VERSION 3.8)
 project (obs-linuxbrowser LANGUAGES C CXX VERSION 0.5)
 
 set(CMAKE_BUILD_TYPE Release CACHE STRING "CMake build type")
@@ -48,9 +48,9 @@ file(COPY ${CEF_RESOURCE_DIR}/locales DESTINATION ${PLUGIN_CEF_DATA_DIRECTORY})
 
 # compilation
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=gnu99")
-# set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
 
 set(LINUXBROWSER_CXX_FEATURES
+    cxx_std_11
     cxx_auto_type
     cxx_constexpr
     cxx_deleted_functions
@@ -58,6 +58,9 @@ set(LINUXBROWSER_CXX_FEATURES
     cxx_override
     cxx_range_for
 )
+
+# Ensure a consistent command chain on all systems
+set(CMAKE_CXX_EXTENSIONS false)
 
 include_directories(src ${OBS_INCLUDE_DIR} ${CEF_INCLUDE_DIR})
 
@@ -94,12 +97,10 @@ add_library(browser_shared OBJECT ${BROWSER_SHARED_SOURCES})
 
 add_executable(browser ${BROWSER_SOURCES} $<TARGET_OBJECTS:browser_shared>)
 target_link_libraries(browser ${CEF_LIBRARIES} pthread rt -static-libstdc++)
-set_property(TARGET browser PROPERTY CXX_STANDARD 11)
 target_compile_features(browser PUBLIC ${LINUXBROWSER_CXX_FEATURES})
 
 add_executable(browser-subprocess ${BROWSER_SUBPROCESS_SOURCES} $<TARGET_OBJECTS:browser_shared>)
 target_link_libraries(browser-subprocess ${CEF_LIBRARIES} pthread rt -static-libstdc++)
-set_property(TARGET browser-subprocess PROPERTY CXX_STANDARD 11)
 target_compile_features(browser-subprocess PUBLIC ${LINUXBROWSER_CXX_FEATURES})
 
 if (${INSTALL_SYSTEMWIDE})
