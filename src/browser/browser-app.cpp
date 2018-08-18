@@ -38,7 +38,7 @@ void file_changed(int signum)
 {
 	inotify_event event;
 
-	if (static_in_fd != 0 && ba != NULL) {
+	if (static_in_fd != 0 && ba != nullptr) {
 		read(static_in_fd, (void*) &event, sizeof(inotify_event));
 		ba->ReloadPage();
 	}

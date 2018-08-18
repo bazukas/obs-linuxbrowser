@@ -1,5 +1,6 @@
 /*
 Copyright (C) 2017 by Azat Khasanshin <azat.khasanshin@gmail.com>
+Copyright (C) 2018 by Adrian Schollmeyer <nexadn@yandex.com>
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -23,7 +24,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "browser-app.hpp"
 
-/* first arugment is full path to the binary
+/* first argument is full path to the binary
  * second is shared memory id */
 int main(int argc, char* argv[])
 {
@@ -39,7 +40,6 @@ int main(int argc, char* argv[])
 	std::string subprocess_path{std::string{argv[0]} + "-subprocess"};
 
 	CefRefPtr<BrowserApp> app{new BrowserApp(argv[2])};
-	CefMainArgs main_args{argc, argv};
 
 	CefSettings settings;
 	CefString(&settings.browser_subprocess_path).FromString(subprocess_path);
@@ -49,7 +49,7 @@ int main(int argc, char* argv[])
 	settings.no_sandbox = true;
 	settings.windowless_rendering_enabled = true;
 
-	CefInitialize(main_args, settings, app.get(), nullptr);
+	CefInitialize({argc, argv}, settings, app.get(), nullptr);
 	CefRunMessageLoop();
 	CefShutdown();
 	return 0;
