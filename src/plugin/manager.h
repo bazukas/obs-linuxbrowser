@@ -1,5 +1,6 @@
 /*
 Copyright (C) 2017 by Azat Khasanshin <azat.khasanshin@gmail.com>
+Copyright (C) 2018 by Adrian Schollmeyer <nexadn@yandex.com>
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

@@ -1,5 +1,6 @@
 /*
 Copyright (C) 2017 by Azat Khasanshin <azat.khasanshin@gmail.com>
+Copyright (C) 2018 by Adrian Schollmeyer <nexadn@yandex.com>
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -199,26 +200,27 @@ void browser_manager_change_url(browser_manager_t* manager, const char* url)
 	if (manager->qid == -1)
 		return;
 
-	if (strlen(url) < MAX_MESSAGE_SIZE) {
-		struct text_message buf;
-		buf.type = MESSAGE_TYPE_URL;
-		strncpy(buf.text, url, MAX_MESSAGE_SIZE);
+	if (strlen(url) < (MAX_MESSAGE_SIZE - 1)) {
+		browser_message_t buf;
+		buf.text.type = MESSAGE_TYPE_URL;
+		strncpy(buf.text.text, url, MAX_MESSAGE_SIZE - 1);
 
 		msgsnd(manager->qid, &buf, strlen(url) + 1, 0);
 	} else {
-		uint packages = ceil((double) strlen(url) / (double) (MAX_MESSAGE_SIZE - 3));
+		uint8_t packages = ceil((double) strlen(url) / (double) (MAX_MESSAGE_SIZE - 3));
 
 		static uint8_t split_id = 0;
 		split_id++;
-		for (uint i = 0; i < packages; i++) {
-			struct split_text_message buf;
-			buf.id = split_id;
-			buf.count = i;
-			buf.max = packages;
-			buf.type = MESSAGE_TYPE_URL_LONG;
+		for (uint8_t i = 0; i < packages; i++) {
+			browser_message_t buf;
+			buf.split_text.id = split_id;
+			buf.split_text.count = i;
+			buf.split_text.max = packages;
+			buf.split_text.type = MESSAGE_TYPE_URL_LONG;
 
-			strncpy(buf.text, &url[i * (MAX_MESSAGE_SIZE - 3)], MAX_MESSAGE_SIZE - 3);
-			msgsnd(manager->qid, &buf, strlen(buf.text) + 3, 0);
+			strncpy(buf.split_text.text, &url[i * (MAX_MESSAGE_SIZE - 3)],
+			        MAX_MESSAGE_SIZE - 3);
+			msgsnd(manager->qid, &buf, strlen(buf.split_text.text) + 3, 0);
 		}
 	}
 }
@@ -228,9 +230,9 @@ void browser_manager_change_css_file(browser_manager_t* manager, const char* css
 	if (manager->qid == -1)
 		return;
 
-	struct text_message buf;
-	buf.type = MESSAGE_TYPE_CSS;
-	strncpy(buf.text, css_file, MAX_MESSAGE_SIZE);
+	browser_message_t buf;
+	buf.text.type = MESSAGE_TYPE_CSS;
+	strncpy(buf.text.text, css_file, MAX_MESSAGE_SIZE);
 
 	msgsnd(manager->qid, &buf, strlen(css_file) + 1, 0);
 }
@@ -245,8 +247,8 @@ void browser_manager_change_size(browser_manager_t* manager, uint32_t width, uin
 	if (manager->qid == -1)
 		return;
 
-	struct generic_message buf;
-	buf.type = MESSAGE_TYPE_SIZE;
+	browser_message_t buf;
+	buf.generic.type = MESSAGE_TYPE_SIZE;
 	msgsnd(manager->qid, &buf, 0, 0);
 
 	pthread_mutex_unlock(&manager->data->mutex);
@@ -257,9 +259,9 @@ void browser_manager_set_scrollbars(browser_manager_t* manager, bool show)
 	if (manager->qid == -1)
 		return;
 
-	struct generic_message buf;
-	buf.type = MESSAGE_TYPE_SCROLLBARS;
-	buf.data[0] = (uint8_t) show;
+	browser_message_t buf;
+	buf.generic_state.type = MESSAGE_TYPE_SCROLLBARS;
+	buf.generic_state.state = show;
 	msgsnd(manager->qid, &buf, 1, 0);
 }
 
@@ -268,9 +270,9 @@ void browser_manager_set_zoom(browser_manager_t* manager, uint32_t zoom)
 	if (manager->qid == -1)
 		return;
 
-	struct zoom_message buf;
-	buf.type = MESSAGE_TYPE_ZOOM;
-	buf.zoom = zoom;
+	browser_message_t buf;
+	buf.zoom.type = MESSAGE_TYPE_ZOOM;
+	buf.zoom.zoom = zoom;
 	msgsnd(manager->qid, &buf, sizeof(zoom), 0);
 }
 
@@ -279,10 +281,10 @@ void browser_manager_set_scroll(browser_manager_t* manager, uint32_t vertical, u
 	if (manager->qid == -1)
 		return;
 
-	struct scroll_message buf;
-	buf.type = MESSAGE_TYPE_SCROLL;
-	buf.vertical = vertical;
-	buf.horizontal = horizontal;
+	browser_message_t buf;
+	buf.scroll.type = MESSAGE_TYPE_SCROLL;
+	buf.scroll.vertical = vertical;
+	buf.scroll.horizontal = horizontal;
 	msgsnd(manager->qid, &buf, sizeof(vertical) + sizeof(horizontal), 0);
 }
 
@@ -291,8 +293,8 @@ void browser_manager_reload_page(browser_manager_t* manager)
 	if (manager->qid == -1)
 		return;
 
-	struct generic_message buf;
-	buf.type = MESSAGE_TYPE_RELOAD;
+	browser_message_t buf;
+	buf.generic.type = MESSAGE_TYPE_RELOAD;
 	msgsnd(manager->qid, &buf, 0, 0);
 }
 
@@ -327,16 +329,16 @@ void browser_manager_send_mouse_click(browser_manager_t* manager, int32_t x, int
 	if (manager->qid == -1)
 		return;
 
-	struct mouse_click_message buf;
-	buf.type = MESSAGE_TYPE_MOUSE_CLICK;
-	buf.x = x;
-	buf.y = y;
-	buf.modifiers = modifiers;
-	buf.button_type = button_type;
-	buf.mouse_up = mouse_up;
-	buf.click_count = click_count;
+	browser_message_t buf;
+	buf.mouse_click.type = MESSAGE_TYPE_MOUSE_CLICK;
+	buf.mouse_click.x = x;
+	buf.mouse_click.y = y;
+	buf.mouse_click.modifiers = modifiers;
+	buf.mouse_click.button_type = button_type;
+	buf.mouse_click.mouse_up = mouse_up;
+	buf.mouse_click.click_count = click_count;
 
-	msgsnd(manager->qid, &buf, sizeof(struct mouse_click_message), 0);
+	msgsnd(manager->qid, &buf, sizeof(buf), 0);
 }
 
 void browser_manager_send_mouse_move(browser_manager_t* manager, int32_t x, int32_t y,
@@ -345,14 +347,15 @@ void browser_manager_send_mouse_move(browser_manager_t* manager, int32_t x, int3
 	if (manager->qid == -1)
 		return;
 
-	struct mouse_move_message buf;
-	buf.type = MESSAGE_TYPE_MOUSE_MOVE;
-	buf.x = x;
-	buf.y = y;
-	buf.modifiers = modifiers;
-	buf.mouse_leave = mouse_leave;
+	// struct mouse_move_message buf;
+	browser_message_t buf;
+	buf.mouse_move.type = MESSAGE_TYPE_MOUSE_MOVE;
+	buf.mouse_move.x = x;
+	buf.mouse_move.y = y;
+	buf.mouse_move.modifiers = modifiers;
+	buf.mouse_move.mouse_leave = mouse_leave;
 
-	msgsnd(manager->qid, &buf, sizeof(struct mouse_move_message), 0);
+	msgsnd(manager->qid, &buf, sizeof(buf), 0);
 }
 
 void browser_manager_send_mouse_wheel(browser_manager_t* manager, int32_t x, int32_t y,
@@ -361,15 +364,15 @@ void browser_manager_send_mouse_wheel(browser_manager_t* manager, int32_t x, int
 	if (manager->qid == -1)
 		return;
 
-	struct mouse_wheel_message buf;
-	buf.type = MESSAGE_TYPE_MOUSE_WHEEL;
-	buf.x = x;
-	buf.y = y;
-	buf.modifiers = modifiers;
-	buf.x_delta = x_delta;
-	buf.y_delta = y_delta;
+	browser_message_t buf;
+	buf.mouse_wheel.type = MESSAGE_TYPE_MOUSE_WHEEL;
+	buf.mouse_wheel.x = x;
+	buf.mouse_wheel.y = y;
+	buf.mouse_wheel.modifiers = modifiers;
+	buf.mouse_wheel.x_delta = x_delta;
+	buf.mouse_wheel.y_delta = y_delta;
 
-	msgsnd(manager->qid, &buf, sizeof(struct mouse_wheel_message), 0);
+	msgsnd(manager->qid, &buf, sizeof(buf), 0);
 }
 
 void browser_manager_send_focus(browser_manager_t* manager, bool focus)
@@ -377,11 +380,11 @@ void browser_manager_send_focus(browser_manager_t* manager, bool focus)
 	if (manager->qid == -1)
 		return;
 
-	struct focus_message buf;
-	buf.type = MESSAGE_TYPE_FOCUS;
-	buf.focus = focus;
+	browser_message_t buf;
+	buf.focus.type = MESSAGE_TYPE_FOCUS;
+	buf.focus.focus = focus;
 
-	msgsnd(manager->qid, &buf, sizeof(struct focus_message), 0);
+	msgsnd(manager->qid, &buf, sizeof(buf), 0);
 }
 
 void browser_manager_send_key(browser_manager_t* manager, bool key_up, uint32_t native_vkey,
@@ -390,14 +393,14 @@ void browser_manager_send_key(browser_manager_t* manager, bool key_up, uint32_t 
 	if (manager->qid == -1)
 		return;
 
-	struct key_message buf;
-	buf.type = MESSAGE_TYPE_KEY;
-	buf.key_up = key_up;
-	buf.native_vkey = native_vkey;
-	buf.modifiers = modifiers;
-	buf.chr = chr;
+	browser_message_t buf;
+	buf.key.type = MESSAGE_TYPE_KEY;
+	buf.key.key_up = key_up;
+	buf.key.native_vkey = native_vkey;
+	buf.key.modifiers = modifiers;
+	buf.key.chr = chr;
 
-	msgsnd(manager->qid, &buf, sizeof(struct key_message), 0);
+	msgsnd(manager->qid, &buf, sizeof(buf), 0);
 }
 
 void browser_manager_send_active_state_change(browser_manager_t* manager, bool active)
@@ -405,10 +408,10 @@ void browser_manager_send_active_state_change(browser_manager_t* manager, bool a
 	if (manager->qid == -1)
 		return;
 
-	struct active_state_message buf;
-	buf.type = MESSAGE_TYPE_ACTIVE_STATE_CHANGE;
-	buf.active = active;
-	msgsnd(manager->qid, &buf, sizeof(struct active_state_message), 0);
+	browser_message_t buf;
+	buf.active_state.type = MESSAGE_TYPE_ACTIVE_STATE_CHANGE;
+	buf.active_state.active = active;
+	msgsnd(manager->qid, &buf, sizeof(buf), 0);
 }
 
 void browser_manager_send_visibility_change(browser_manager_t* manager, bool visible)
@@ -416,8 +419,8 @@ void browser_manager_send_visibility_change(browser_manager_t* manager, bool vis
 	if (manager->qid == -1)
 		return;
 
-	struct visibility_message buf;
-	buf.type = MESSAGE_TYPE_VISIBILITY_CHANGE;
-	buf.visible = visible;
-	msgsnd(manager->qid, &buf, sizeof(struct visibility_message), 0);
+	browser_message_t buf;
+	buf.visibility.type = MESSAGE_TYPE_VISIBILITY_CHANGE;
+	buf.visibility.visible = visible;
+	msgsnd(manager->qid, &buf, sizeof(buf), 0);
 }

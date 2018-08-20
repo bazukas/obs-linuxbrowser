@@ -18,8 +18,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #pragma once
 
 #include <string>
+#include <thread>
 
-#include <include/cef_app.h>
+#include <cef_app.h>
 
 #include "browser-client.hpp"
 #include "shared.h"
@@ -86,21 +87,22 @@ private:
 	void ExecuteJSFunction(CefRefPtr<CefBrowser> browser, const char* functionName,
 	                       CefV8ValueList arguments);
 
+	void MessageThreadWorker();
+
 private:
 	CefRefPtr<CefBrowser> browser;
 	CefRefPtr<BrowserClient> client;
-	pthread_t message_thread;
-	char* shm_name;
+	std::thread messageThread;
+	std::string shm_name;
 	uint32_t width;
 	uint32_t height;
 	int fps;
 	int fd;
 	int qid;
-	struct shared_data* data;
+	shared_data_t* data;
 	std::string css;
 	int in_fd;
-	int in_wd = -1;
+	int in_wd{-1};
 
 	IMPLEMENT_REFCOUNTING(BrowserApp);
 };
-

@@ -14,13 +14,12 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-#include <include/cef_app.h>
+#include <cef_app.h>
 
 #include "browser-app.hpp"
 
 int main(int argc, char* argv[])
 {
-	CefMainArgs main_args(argc, argv);
-	CefRefPtr<BrowserApp> app(new BrowserApp(NULL));
-	return CefExecuteProcess(main_args, app.get(), NULL);
+	CefRefPtr<BrowserApp> app{new BrowserApp(nullptr)};
+	return CefExecuteProcess({argc, argv}, app.get(), nullptr);
 }

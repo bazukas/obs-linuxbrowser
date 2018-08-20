@@ -16,7 +16,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 #pragma once
 
-#include <include/cef_client.h>
+#include <cef_client.h>
 
 #include "shared.h"
 
@@ -25,7 +25,7 @@ class BrowserClient
         , public CefRenderHandler
         , public CefLoadHandler {
 public:
-	BrowserClient(struct shared_data* data, std::string css);
+	BrowserClient(shared_data_t* data, std::string css);
 
 	virtual CefRefPtr<CefRenderHandler> GetRenderHandler() OVERRIDE
 	{
@@ -53,9 +53,9 @@ public:
 	void SetScroll(CefRefPtr<CefBrowser> browser, uint32_t vertical, uint32_t horizontal);
 
 private:
-	struct shared_data* data;
+	shared_data_t* data;
 	std::string css;
-	bool show_scrollbars = true;
+	bool show_scrollbars{true};
 	uint32_t zoom;
 	uint32_t scroll_vertical;
 	uint32_t scroll_horizontal;

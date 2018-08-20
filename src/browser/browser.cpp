@@ -1,5 +1,6 @@
 /*
 Copyright (C) 2017 by Azat Khasanshin <azat.khasanshin@gmail.com>
+Copyright (C) 2018 by Adrian Schollmeyer <nexadn@yandex.com>
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -19,11 +20,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <sys/prctl.h>
 #include <unistd.h>
 
-#include <include/cef_app.h>
+#include <cef_app.h>
 
 #include "browser-app.hpp"
 
-/* first arugment is full path to the binary
+/* first argument is full path to the binary
  * second is shared memory id */
 int main(int argc, char* argv[])
 {
@@ -31,15 +32,14 @@ int main(int argc, char* argv[])
 	prctl(PR_SET_PDEATHSIG, SIGTERM);
 
 	/* different path settings for cef */
-	std::string data_dir(argv[1]);
-	std::string resources_dir = data_dir + "/cef";
-	std::string locales_dir = resources_dir + "/locales";
-	std::string home_dir = getpwuid(getuid())->pw_dir;
-	std::string cache_dir = home_dir + "/.cache/obs-linuxbrowser/" + std::string(argv[2]);
-	std::string subprocess_path = std::string(argv[0]) + "-subprocess";
+	std::string data_dir{argv[1]};
+	std::string resources_dir{data_dir + "/cef"};
+	std::string locales_dir{resources_dir + "/locales"};
+	std::string home_dir{getpwuid(getuid())->pw_dir};
+	std::string cache_dir{home_dir + "/.cache/obs-linuxbrowser/" + std::string{argv[2]}};
+	std::string subprocess_path{std::string{argv[0]} + "-subprocess"};
 
-	CefRefPtr<BrowserApp> app(new BrowserApp(argv[2]));
-	CefMainArgs main_args(argc, argv);
+	CefRefPtr<BrowserApp> app{new BrowserApp(argv[2])};
 
 	CefSettings settings;
 	CefString(&settings.browser_subprocess_path).FromString(subprocess_path);
@@ -49,9 +49,8 @@ int main(int argc, char* argv[])
 	settings.no_sandbox = true;
 	settings.windowless_rendering_enabled = true;
 
-	CefInitialize(main_args, settings, app.get(), NULL);
+	CefInitialize({argc, argv}, settings, app.get(), nullptr);
 	CefRunMessageLoop();
 	CefShutdown();
-
 	return 0;
 }
