@@ -34,9 +34,11 @@ You don't need to build the plugin if you've downloaded a binary release, instru
 
 ## Building CEF
 
-* Download CEF minimal or standard binary release from http://opensource.spotify.com/cefbuilds/index.html
+* Download CEF minimal or standard binary release from http://opensource.spotify.com/cefbuilds/index.html [2]
 * Extract and cd into folder
 * Run `cmake ./ && make libcef_dll_wrapper`
+
+[2] Due to unknown reasons certain CEF versions do not work properly with OBS-Studio. See issue [#63](https://github.com/bazukas/obs-linuxbrowser/issues/63) for a list of versions which have been confirmed to be working and to track progress on this issue.
 
 ## Building Plugin
 
@@ -45,10 +47,10 @@ Make sure you have obs-studio installed.
 * `cd obs-linuxbrowser`
 * `mkdir build`
 * `cd build`
-* `cmake -DCEF_ROOT_DIR=<path to your cef dir> ..` [2]
+* `cmake -DCEF_ROOT_DIR=<path to your cef dir> ..` [3]
 * `make`
 
-[2] If you've installed OBS under an installation prefix other than `/usr` (meaning include files aren't located at `/usr/include/obs` and library files aren't located at `/usr/lib`), you need to set `OBS_ROOT_DIR` to reflect the actual installation prefix. If you don't know your installation prefix, you can also set `OBS_INCLUDE_SEARCH_DIR` to the location of your OBS installation's header files and `OBS_LIBRARY_SEARCH_DIR` to the location of your OBS installation's library (.so) files. *In most cases, though, this is NOT required at all.*
+[3] If you've installed OBS under an installation prefix other than `/usr` (meaning include files aren't located at `/usr/include/obs` and library files aren't located at `/usr/lib`), you need to set `OBS_ROOT_DIR` to reflect the actual installation prefix. If you don't know your installation prefix, you can also set `OBS_INCLUDE_SEARCH_DIR` to the location of your OBS installation's header files and `OBS_LIBRARY_SEARCH_DIR` to the location of your OBS installation's library (.so) files. *In most cases, though, this is NOT required at all.*
 
 *Info: If you intend to install obs-linuxbrowser system wide (though the OBS developers don't recommend that), you can add `-DINSTALL_SYSTEMWIDE=true` to the CMake call. obs-linuxbrowser will then be installed to `/usr/lib/obs-plugins` (binaries) and `/usr/share/obs/obs-plugins/obs-linuxbrowser` (data).*
 
