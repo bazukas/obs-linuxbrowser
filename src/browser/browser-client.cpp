@@ -16,7 +16,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include <algorithm>
-#include <math.h>
+#include <cmath>
 
 #include "base64.hpp"
 #include "browser-client.hpp"
@@ -43,7 +43,7 @@ void BrowserClient::OnPaint(CefRefPtr<CefBrowser> browser, CefRenderHandler::Pai
 	if (type == PET_VIEW) {
 		pthread_mutex_lock(&data->mutex);
 		size_t len = std::min(vwidth * vheight * 4, int(data->width * data->height * 4));
-		memcpy(&data->data, buffer, len);
+		std::memcpy(&data->data, buffer, len);
 		pthread_mutex_unlock(&data->mutex);
 	}
 }
@@ -88,7 +88,7 @@ void BrowserClient::SetScrollbars(CefRefPtr<CefBrowser> browser, bool show)
 void BrowserClient::SetZoom(CefRefPtr<CefBrowser> browser, uint32_t zoom)
 {
 	this->zoom = zoom;
-	double zoom_scale = log(zoom / 100.0) / log(1.2);
+	double zoom_scale{log(zoom / 100.0) / log(1.2)};
 	browser->GetHost()->SetZoomLevel(zoom_scale);
 }
 
@@ -96,8 +96,8 @@ void BrowserClient::SetScroll(CefRefPtr<CefBrowser> browser, uint32_t vertical, 
 {
 	this->scroll_vertical = vertical;
 	this->scroll_horizontal = horizontal;
-	CefRefPtr<CefFrame> frame = browser->GetMainFrame();
-	std::string script = "window.scrollTo(";
+	CefRefPtr<CefFrame> frame{browser->GetMainFrame()};
+	std::string script{"window.scrollTo("};
 	script += std::to_string(horizontal) + "," + std::to_string(vertical) + ");";
 	frame->ExecuteJavaScript(script, frame->GetURL(), 0);
 }

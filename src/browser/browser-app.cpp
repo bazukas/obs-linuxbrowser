@@ -30,10 +30,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "config.h"
 
 /* for signal handling */
-int static_in_fd = 0;
-BrowserApp* ba = nullptr;
 namespace
 {
+int static_in_fd{0};
+BrowserApp* ba{nullptr};
 void file_changed(int signum)
 {
 	inotify_event event;
@@ -43,11 +43,15 @@ void file_changed(int signum)
 		ba->ReloadPage();
 	}
 }
+
+auto beginsWith{[](const std::string base, const std::string beginning) {
+	return base.substr(0, beginning.size()) == beginning;
+}};
 } // namespace
 
 BrowserApp::BrowserApp(char* shmname)
 {
-	if (shmname != nullptr && shmname == SHM_NAME) {
+	if (shmname != nullptr && beginsWith({shmname}, {SHM_NAME})) {
 		shm_name = shmname;
 
 		// init inotify
@@ -55,7 +59,7 @@ BrowserApp::BrowserApp(char* shmname)
 		fcntl(in_fd, F_SETFL, O_ASYNC);
 		fcntl(in_fd, F_SETOWN, getpid());
 		struct sigaction action;
-		memset(&action, 0, sizeof(struct sigaction));
+		std::memset(&action, 0, sizeof(struct sigaction));
 		action.sa_handler = file_changed;
 		sigaction(SIGIO, &action, nullptr);
 		static_in_fd = in_fd;
@@ -95,7 +99,7 @@ void BrowserApp::InitSharedData()
 	fps = data->fps;
 	pthread_mutex_unlock(&data->mutex);
 
-	data = reinterpret_cast<shared_data*>(mmap(NULL, sizeof(shared_data) + MAX_DATA_SIZE,
+	data = reinterpret_cast<shared_data*>(mmap(nullptr, sizeof(shared_data) + MAX_DATA_SIZE,
 	                                           PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0));
 	if (data == MAP_FAILED) {
 		std::cerr << "Browser: data remapping failed\n";
@@ -243,7 +247,7 @@ void BrowserApp::UrlChanged(std::string url)
 		in_wd = -1;
 	}
 
-	if (url.substr(0, 8) == "file:///") {
+	if (beginsWith(url, "file:///")) {
 		in_wd = inotify_add_watch(in_fd, url.substr(8).c_str(), IN_MODIFY);
 	}
 }
@@ -281,14 +285,13 @@ void BrowserApp::OnContextInitialized()
 	CefBrowserSettings settings;
 	settings.windowless_frame_rate = fps;
 
-	CefRefPtr<BrowserClient> client(new BrowserClient(data, css));
+	CefRefPtr<BrowserClient> client{new BrowserClient(data, css)};
 	this->client = client;
 
 	browser = CefBrowserHost::CreateBrowserSync(
 	    info, client.get(), "https://github.com/bazukas/obs-linuxbrowser/", settings, nullptr);
 	client->SetScroll(browser, 0, 0); // workaround for scroll to bottom bug
 
-	// pthread_create(&message_thread, nullptr, MessageThread, this);
 	messageThread = std::thread{[this] { this->MessageThreadWorker(); }};
 }
 

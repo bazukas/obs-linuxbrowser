@@ -20,7 +20,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 int main(int argc, char* argv[])
 {
-	CefMainArgs main_args(argc, argv);
 	CefRefPtr<BrowserApp> app{new BrowserApp(nullptr)};
-	return CefExecuteProcess(main_args, app.get(), nullptr);
+	return CefExecuteProcess({argc, argv}, app.get(), nullptr);
 }
