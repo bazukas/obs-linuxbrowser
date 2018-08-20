@@ -104,7 +104,7 @@ target_link_libraries(browser-subprocess ${CEF_LIBRARIES} pthread rt -static-lib
 target_compile_features(browser-subprocess PUBLIC ${LINUXBROWSER_CXX_FEATURES})
 
 if (${INSTALL_SYSTEMWIDE})
-    install(DIRECTORY ${PLUGIN_BIN_DIRECTORY}/.. DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/obs-plugins)
+    install(DIRECTORY ${PLUGIN_BIN_DIRECTORY}/ DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/obs-plugins)
     install(DIRECTORY ${PLUGIN_DATA_DIRECTORY} DESTINATION ${CMAKE_INSTALL_PREFIX}/share/obs/obs-plugins/obs-linuxbrowser)
 else()
     install(DIRECTORY ${PLUGIN_DIRECTORY} DESTINATION ${CMAKE_INSTALL_PREFIX}/.config/obs-studio/plugins USE_SOURCE_PERMISSIONS)
