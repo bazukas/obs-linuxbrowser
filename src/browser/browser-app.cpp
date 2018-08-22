@@ -76,6 +76,12 @@ BrowserApp::~BrowserApp()
 		close(in_fd);
 }
 
+void BrowserApp::OnBeforeCommandLineProcessing(const CefString& processType,
+                                               CefRefPtr<CefCommandLine> commandLine)
+{
+	commandLine->AppendSwitchWithValue("autoplay-policy", "no-user-gesture-required");
+}
+
 // Open shared memory and read initial data
 void BrowserApp::InitSharedData()
 {
