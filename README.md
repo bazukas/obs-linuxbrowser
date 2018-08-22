@@ -18,7 +18,7 @@ terms of browser capabilities.
 
 * Download the latest release from the [releases page](https://github.com/bazukas/obs-linuxbrowser/releases). Make sure the release version matches obs-studio version on your system [1].
 * `mkdir -p $HOME/.config/obs-studio/plugins`
-* Untar, e.g.: `tar -zxvf linuxbrowser0.5.1-obs21.1.2-64bit.tgz -C $HOME/.config/obs-studio/plugins/`
+* Untar, e.g.: `tar -zxvf linuxbrowser0.5.2-obs21.1.2-64bit.tgz -C $HOME/.config/obs-studio/plugins/`
 * Install the dependencies (see Dependencies section)
 
 
@@ -26,7 +26,7 @@ Arch Linux users can install obs-linuxbrowser from the official AUR packages [ob
 
 You don't need to build the plugin if you've downloaded a binary release, instructions below are for people who want to compile the plugin themselves.
 
-[1] Every binary release has the version number of OBS contained as part of the file name, e.g. “linuxbrowser0.5.1-obs21.1.2-64bit.tgz” refers to obs-linuxbrowser version 0.5.1 with OBS version 21.1.2.
+[1] Every binary release has the version number of OBS contained as part of the file name, e.g. “linuxbrowser0.5.2-obs21.1.2-64bit.tgz” refers to obs-linuxbrowser version 0.5.2 with OBS version 21.1.2.
 
 # Building from source
 
@@ -87,7 +87,7 @@ Some builds of CEF seem to be not working with obs-linuxbrowser.
 We weren't able to figure out the exact cause of this, but we assume that it's a CEF-related issue we can't fix.
 Check issue [#63](https://github.com/bazukas/obs-linuxbrowser/issues/63) for information about CEF versions that are known to be working.
 
-*Problems might also occur when updating CEF withouth recompiling obs-linuxbrowser afterwards. **Please make sure to recompile obs-linuxbrowser before opening issues concerning problems with certain CEF versions.** *
+*Problems might also occur when updating CEF withouth recompiling obs-linuxbrowser afterwards. **Please make sure to recompile obs-linuxbrowser before opening issues concerning problems with certain CEF versions.***
 
 ## Transparency not working correctly: Transparent white browser content appears gray on white scene background.
 As stated in issue [#58](https://github.com/bazukas/obs-linuxbrowser/issues/58), there is a limitation in CEF, making it unable to detect the background of the OBS scenes.

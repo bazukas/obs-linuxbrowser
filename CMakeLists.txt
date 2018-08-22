@@ -1,5 +1,5 @@
 cmake_minimum_required (VERSION 3.8)
-project (obs-linuxbrowser LANGUAGES C CXX VERSION 0.5.1)
+project (obs-linuxbrowser LANGUAGES C CXX VERSION 0.5.2)
 
 set(CMAKE_BUILD_TYPE Release CACHE STRING "CMake build type")
 
