@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <stdio.h>
 
 #include "manager.h"
-#include "WindowsKeyboardCodes.h"
+#include "windows_keycode.h"
 
 OBS_DECLARE_MODULE()
 OBS_MODULE_USE_DEFAULT_LOCALE("linuxbrowser-source", "en-US")

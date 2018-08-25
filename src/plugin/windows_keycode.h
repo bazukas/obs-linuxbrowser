@@ -3,13 +3,23 @@
 #define VK_UNKNOWN 0
 
 // Left mouse button
+#ifndef VK_LBUTTON
 #define VK_LBUTTON 0x01
+#endif
 // Right mouse button
+#ifndef VK_RBUTTON
 #define VK_RBUTTON 0x02
+#endif
 // Middle mouse button (three-button mouse)
+#ifndef VK_MBUTTON
 #define VK_MBUTTON 0x04
+#endif
+#ifndef VK_XBUTTON1
 #define VK_XBUTTON1 0x05
+#endif
+#ifndef VK_XBUTTON2
 #define VK_XBUTTON2 0x06
+#endif
 
 #ifndef VK_BACK
 #define VK_BACK 0x08
