@@ -53,6 +53,7 @@ typedef struct shared_data {
 #define MESSAGE_TYPE_ACTIVE_STATE_CHANGE 13
 #define MESSAGE_TYPE_VISIBILITY_CHANGE 14
 #define MESSAGE_TYPE_URL_LONG 15
+#define MESSAGE_TYPE_JS 16
 
 typedef union {
 	struct {

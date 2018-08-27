@@ -165,6 +165,9 @@ void BrowserApp::MessageThreadWorker()
 			case MESSAGE_TYPE_CSS:
 				this->CssChanged(msg.text.text);
 				break;
+			case MESSAGE_TYPE_JS:
+				this->JsChanged(msg.text.text);
+				break;
 			case MESSAGE_TYPE_MOUSE_CLICK:
 				e.modifiers = msg.mouse_click.modifiers;
 				e.x = msg.mouse_click.x;
@@ -270,6 +273,20 @@ void BrowserApp::CssChanged(const char* css_file)
 	}
 
 	client->ChangeCss(css);
+}
+
+void BrowserApp::JsChanged(std::string jsFile)
+{
+	std::ifstream t{jsFile, std::ifstream::in};
+	if (t.good()) {
+		std::stringstream buf;
+		buf << t.rdbuf();
+		this->js = buf.str();
+	} else {
+		this->js = "";
+	}
+
+	this->client->ChangeJs(this->js);
 }
 
 void BrowserApp::ReloadPage()

@@ -1,5 +1,6 @@
 /*
 Copyright (C) 2017 by Azat Khasanshin <azat.khasanshin@gmail.com>
+Copyright (C) 2018 by Adrian Schollmeyer <nexadn@yandex.com>
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -48,6 +49,7 @@ public:
 	{
 		this->css = css;
 	};
+	void ChangeJs(std::string js);
 	void SetScrollbars(CefRefPtr<CefBrowser> browser, bool show);
 	void SetZoom(CefRefPtr<CefBrowser> browser, uint32_t zoom);
 	void SetScroll(CefRefPtr<CefBrowser> browser, uint32_t vertical, uint32_t horizontal);
@@ -55,6 +57,7 @@ public:
 private:
 	shared_data_t* data;
 	std::string css;
+	std::string js;
 	bool show_scrollbars{true};
 	uint32_t zoom;
 	uint32_t scroll_vertical;
