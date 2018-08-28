@@ -237,6 +237,18 @@ void browser_manager_change_css_file(browser_manager_t* manager, const char* css
 	msgsnd(manager->qid, &buf, strlen(css_file) + 1, 0);
 }
 
+void browser_manager_change_js_file(browser_manager_t* manager, const char* js_file)
+{
+	if (manager->qid < 0)
+		return;
+
+	browser_message_t buf;
+	buf.text.type = MESSAGE_TYPE_JS;
+	strncpy(buf.text.text, js_file, MAX_MESSAGE_SIZE);
+
+	msgsnd(manager->qid, &buf, strlen(js_file) + 1, 0);
+}
+
 void browser_manager_change_size(browser_manager_t* manager, uint32_t width, uint32_t height)
 {
 	pthread_mutex_lock(&manager->data->mutex);

@@ -43,6 +43,7 @@ uint8_t* get_browser_manager_data(browser_manager_t* manager);
 
 void browser_manager_change_url(browser_manager_t* manager, const char* url);
 void browser_manager_change_css_file(browser_manager_t* manager, const char* css_file);
+void browser_manager_change_js_file(browser_manager_t* manager, const char* js_file);
 void browser_manager_change_size(browser_manager_t* manager, uint32_t width, uint32_t height);
 void browser_manager_set_scrollbars(browser_manager_t* manager, bool show);
 void browser_manager_set_zoom(browser_manager_t* manager, uint32_t zoom);

@@ -1,6 +1,7 @@
 /*
 Copyright (C) 2017 by Azat Khasanshin <azat.khasanshin@gmail.com>,
                       John R. Bradley <jrb@turrettech.com>
+Copyright (C) 2018 by Adrian Schollmeyer <nexadn@yandex.com>
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -57,13 +58,16 @@ void BrowserClient::OnLoadEnd(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame>
 		std::string href = "data:text/css;charset=utf-8;base64," + base64EncodedCSS;
 
 		std::string script = "";
-		script += "var link = document.createElement('link');";
+		script += "let link = document.createElement('link');";
 		script += "link.setAttribute('rel', 'stylesheet');";
 		script += "link.setAttribute('type', 'text/css');";
 		script += "link.setAttribute('href', '" + href + "');";
 		script += "document.getElementsByTagName('head')[0].appendChild(link);";
 
 		frame->ExecuteJavaScript(script, href, 0);
+	}
+	if (frame->IsMain() && js != "") {
+		frame->ExecuteJavaScript(this->js, "", 0);
 	}
 	SetScrollbars(browser, show_scrollbars);
 	SetZoom(browser, zoom);
@@ -100,4 +104,9 @@ void BrowserClient::SetScroll(CefRefPtr<CefBrowser> browser, uint32_t vertical, 
 	std::string script{"window.scrollTo("};
 	script += std::to_string(horizontal) + "," + std::to_string(vertical) + ");";
 	frame->ExecuteJavaScript(script, frame->GetURL(), 0);
+}
+
+void BrowserClient::ChangeJs(std::string js)
+{
+	this->js = js;
 }

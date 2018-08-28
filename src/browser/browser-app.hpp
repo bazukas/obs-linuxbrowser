@@ -59,6 +59,7 @@ public:
 	void UrlChanged(const char* url);
 	void UrlChanged(std::string url);
 	void CssChanged(const char* css_file);
+	void JsChanged(std::string jsFile);
 	void ReloadPage();
 
 	CefRefPtr<BrowserClient> GetClient()
@@ -104,6 +105,7 @@ private:
 	int qid;
 	shared_data_t* data;
 	std::string css;
+	std::string js;
 	int in_fd;
 	int in_wd{-1};
 

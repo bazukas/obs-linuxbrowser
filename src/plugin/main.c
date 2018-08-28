@@ -31,6 +31,7 @@ struct browser_data {
 	uint32_t height;
 	uint32_t fps;
 	char* css_file;
+	char* js_file;
 	bool hide_scrollbars;
 	uint32_t zoom;
 	uint32_t scroll_vertical;
@@ -80,6 +81,7 @@ static void browser_update(void* vptr, obs_data_t* settings)
 		url = obs_data_get_string(settings, "url");
 
 	const char* css_file = obs_data_get_string(settings, "css_file");
+	const char* js_file = obs_data_get_string(settings, "js_file");
 
 	if (!data->manager)
 		data->manager = create_browser_manager(data->width, data->height, data->fps,
@@ -119,6 +121,12 @@ static void browser_update(void* vptr, obs_data_t* settings)
 		data->css_file = bstrdup(css_file);
 		browser_manager_change_css_file(data->manager, data->css_file);
 	}
+	if (!data->js_file || strcmp(js_file, data->js_file) != 0) {
+		if (data->js_file)
+			bfree(data->js_file);
+		data->js_file = bstrdup(js_file);
+		browser_manager_change_js_file(data->manager, data->js_file);
+	}
 
 	/* need to recreate texture if size changed */
 	pthread_mutex_lock(&data->textureLock);
@@ -143,6 +151,7 @@ static void reload_hotkey_pressed(void* vptr, obs_hotkey_id id, obs_hotkey_t* ke
 
 	struct browser_data* data = vptr;
 	browser_manager_change_css_file(data->manager, data->css_file);
+	browser_manager_change_js_file(data->manager, data->js_file);
 	browser_manager_reload_page(data->manager);
 }
 
@@ -204,6 +213,7 @@ static bool reload_button_clicked(obs_properties_t* props, obs_property_t* prope
 	UNUSED_PARAMETER(property);
 	struct browser_data* data = vptr;
 	browser_manager_change_css_file(data->manager, data->css_file);
+	browser_manager_change_js_file(data->manager, data->js_file);
 	browser_manager_reload_page(data->manager);
 	return true;
 }
@@ -222,6 +232,7 @@ static bool restart_button_clicked(obs_properties_t* props, obs_property_t* prop
 	struct browser_data* data = vptr;
 	browser_manager_restart_browser(data->manager);
 	browser_manager_change_css_file(data->manager, data->css_file);
+	browser_manager_change_js_file(data->manager, data->js_file);
 	browser_manager_change_url(data->manager, data->url);
 	browser_manager_set_scrollbars(data->manager, !data->hide_scrollbars);
 	browser_manager_set_zoom(data->manager, data->zoom);
@@ -272,6 +283,8 @@ static obs_properties_t* browser_get_properties(void* vptr)
 
 	obs_properties_add_path(props, "css_file", obs_module_text("CustomCSS"), OBS_PATH_FILE,
 	                        "*.css", NULL);
+	obs_properties_add_path(props, "js_file", obs_module_text("CustomJS"), OBS_PATH_FILE,
+	                        "*.js", NULL);
 
 	obs_properties_add_path(props, "flash_path", obs_module_text("FlashPath"), OBS_PATH_FILE,
 	                        "*.so", NULL);
@@ -399,6 +412,7 @@ static void browser_source_show(void* vptr)
 	if (data->stop_on_hide) {
 		browser_manager_start_browser(data->manager);
 		browser_manager_change_css_file(data->manager, data->css_file);
+		browser_manager_change_js_file(data->manager, data->js_file);
 		browser_manager_change_url(data->manager, data->url);
 		browser_manager_set_scrollbars(data->manager, !data->hide_scrollbars);
 		browser_manager_set_zoom(data->manager, data->zoom);
