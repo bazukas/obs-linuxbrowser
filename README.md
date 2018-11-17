@@ -97,4 +97,7 @@ With a black background, transparency seems to be working out quite fine.
 This issue cannot be fixed.
 
 ## OBS-Linuxbrowser not compiling, complaining about having to use ISO C++11 standard (old compiler versions)
-See [#88](https://github.com/bazukas/obs-linuxbrowser/issues/88) for details. Some older compiler versions seem to have trouble with our current CMake setup. Using newer versions (e.g. GCC 8.x) should word.
+See [#88](https://github.com/bazukas/obs-linuxbrowser/issues/88) for details. Some older compiler versions seem to have trouble with our current CMake setup. Using newer versions (e.g. GCC 8.x) should work.
+
+## OBS-Linuxbrowser crashing when using amdgpu
+See [#89](https://github.com/bazukas/obs-linuxbrowser/issues/89) for details. obs-linuxbrowser seems to crash on machines using amdgpu drivers. Unfortunately, this issue cannot be fixed.
