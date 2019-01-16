@@ -1,4 +1,4 @@
-cmake_minimum_required (VERSION 3.8)
+cmake_minimum_required (VERSION 3.0)
 project (obs-linuxbrowser LANGUAGES C CXX VERSION 0.5.2)
 
 set(CMAKE_BUILD_TYPE Release CACHE STRING "CMake build type")
@@ -48,16 +48,8 @@ file(COPY ${CEF_RESOURCE_DIR}/locales DESTINATION ${PLUGIN_CEF_DATA_DIRECTORY})
 
 # compilation
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=gnu99")
-
-set(LINUXBROWSER_CXX_FEATURES
-    cxx_std_11
-    cxx_auto_type
-    cxx_constexpr
-    cxx_deleted_functions
-    cxx_nullptr
-    cxx_override
-    cxx_range_for
-)
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED true)
 
 # Ensure a consistent command chain on all systems
 set(CMAKE_CXX_EXTENSIONS false)
