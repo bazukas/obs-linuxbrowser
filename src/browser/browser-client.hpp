@@ -1,6 +1,6 @@
 /*
 Copyright (C) 2017 by Azat Khasanshin <azat.khasanshin@gmail.com>
-Copyright (C) 2018 by Adrian Schollmeyer <nexadn@yandex.com>
+Copyright (C) 2018, 2019 by Adrian Schollmeyer <nexadn@yandex.com>
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -21,6 +21,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "shared.h"
 
+#include "config.h"
+
 class BrowserClient
         : public CefClient
         , public CefRenderHandler
@@ -37,7 +39,8 @@ public:
 		return this;
 	}
 
-	virtual bool GetViewRect(CefRefPtr<CefBrowser> browser, CefRect& rect) OVERRIDE;
+	virtual BC_GET_VIEW_RECT_RETURN_TYPE GetViewRect(CefRefPtr<CefBrowser> browser,
+	                                                 CefRect& rect) override;
 	virtual void OnPaint(CefRefPtr<CefBrowser> browser, CefRenderHandler::PaintElementType type,
 	                     const CefRenderHandler::RectList& dirtyRects, const void* buffer,
 	                     int width, int height) OVERRIDE;

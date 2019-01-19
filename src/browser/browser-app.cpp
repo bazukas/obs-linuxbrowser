@@ -44,9 +44,10 @@ void file_changed(int signum)
 	}
 }
 
-auto beginsWith{[](const std::string base, const std::string beginning) {
+bool beginsWith(const std::string& base, const std::string& beginning)
+{
 	return base.substr(0, beginning.size()) == beginning;
-}};
+}
 } // namespace
 
 BrowserApp::BrowserApp(char* shmname)
