@@ -1,1 +1,12 @@
+// clang-format off
+
 #define LINUXBROWSER_VERSION "@PROJECT_VERSION@"
+#define CEF_BUILD @CEF_CHROME_BUILD@
+
+#if CEF_BUILD >= 3578
+# define BC_GET_VIEW_RECT_RETURN_TYPE void
+# define BC_GET_VIEW_RECT_RETURN
+#else
+# define BC_GET_VIEW_RECT_RETURN_TYPE bool
+# define BC_GET_VIEW_RECT_RETURN return true;
+#endif

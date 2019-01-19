@@ -21,6 +21,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "shared.h"
 
+#include "config.h"
+
 class BrowserClient
         : public CefClient
         , public CefRenderHandler
@@ -37,7 +39,8 @@ public:
 		return this;
 	}
 
-	virtual void GetViewRect(CefRefPtr<CefBrowser> browser, CefRect& rect) override;
+	virtual BC_GET_VIEW_RECT_RETURN_TYPE GetViewRect(CefRefPtr<CefBrowser> browser,
+	                                                 CefRect& rect) override;
 	virtual void OnPaint(CefRefPtr<CefBrowser> browser, CefRenderHandler::PaintElementType type,
 	                     const CefRenderHandler::RectList& dirtyRects, const void* buffer,
 	                     int width, int height) OVERRIDE;

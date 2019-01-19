@@ -28,11 +28,13 @@ BrowserClient::BrowserClient(shared_data_t* data, std::string css)
 	this->css = css;
 }
 
-void BrowserClient::GetViewRect(CefRefPtr<CefBrowser> browser, CefRect& rect)
+BC_GET_VIEW_RECT_RETURN_TYPE BrowserClient::GetViewRect(CefRefPtr<CefBrowser> browser,
+                                                        CefRect& rect)
 {
 	pthread_mutex_lock(&data->mutex);
 	rect.Set(0, 0, data->width, data->height);
 	pthread_mutex_unlock(&data->mutex);
+	BC_GET_VIEW_RECT_RETURN
 }
 
 void BrowserClient::OnPaint(CefRefPtr<CefBrowser> browser, CefRenderHandler::PaintElementType type,
