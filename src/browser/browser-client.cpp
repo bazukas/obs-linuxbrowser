@@ -1,7 +1,7 @@
 /*
 Copyright (C) 2017 by Azat Khasanshin <azat.khasanshin@gmail.com>,
                       John R. Bradley <jrb@turrettech.com>
-Copyright (C) 2018 by Adrian Schollmeyer <nexadn@yandex.com>
+Copyright (C) 2018, 2019 by Adrian Schollmeyer <nexadn@yandex.com>
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -28,12 +28,11 @@ BrowserClient::BrowserClient(shared_data_t* data, std::string css)
 	this->css = css;
 }
 
-bool BrowserClient::GetViewRect(CefRefPtr<CefBrowser> browser, CefRect& rect)
+void BrowserClient::GetViewRect(CefRefPtr<CefBrowser> browser, CefRect& rect)
 {
 	pthread_mutex_lock(&data->mutex);
 	rect.Set(0, 0, data->width, data->height);
 	pthread_mutex_unlock(&data->mutex);
-	return true;
 }
 
 void BrowserClient::OnPaint(CefRefPtr<CefBrowser> browser, CefRenderHandler::PaintElementType type,
