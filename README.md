@@ -47,7 +47,7 @@ Make sure you have obs-studio installed.
 * `cd obs-linuxbrowser`
 * `mkdir build`
 * `cd build`
-* `cmake -DCEF_ROOT_DIR=<path to your cef dir> ..` [3]
+* `cmake -DCEF_ROOT_DIR=<path to your cef dir> ..` (don't forget the two dots at the end!) [3]
 * `make`
 
 [3] If you've installed OBS under an installation prefix other than `/usr` (meaning include files aren't located at `/usr/include/obs` and library files aren't located at `/usr/lib`), you need to set `OBS_ROOT_DIR` to reflect the actual installation prefix. If you don't know your installation prefix, you can also set `OBS_INCLUDE_SEARCH_DIR` to the location of your OBS installation's header files and `OBS_LIBRARY_SEARCH_DIR` to the location of your OBS installation's library (.so) files. *In most cases, though, this is NOT required at all.*
@@ -83,9 +83,10 @@ All off the following bindings are children of `window.obsstudio`.
 Using obs-linuxbrowser with an older OBS version than the one which has been used for compilation makes OBS break. Compile obs-linuxbrowser with the same OBS version you are going to use for streaming/recording or select a binary release whose OBS version matches the same version as yours. If you've compiled obs-linuxbrowser yourself, recompile it with the older version of OBS.
 
 ## OBS-Linuxbrowser not displaying any content with certain versions of CEF
-Some builds of CEF seem to be not working with obs-linuxbrowser.
+~~Some builds of CEF seem to be not working with obs-linuxbrowser.
 We weren't able to figure out the exact cause of this, but we assume that it's a CEF-related issue we can't fix.
-Check issue [#63](https://github.com/bazukas/obs-linuxbrowser/issues/63) for information about CEF versions that are known to be working.
+Check issue [#63](https://github.com/bazukas/obs-linuxbrowser/issues/63) for information about CEF versions that are known to be working.~~
+This issue seems to have been resolved. If it occurs again, please open a new issue.
 
 *Problems might also occur when updating CEF withouth recompiling obs-linuxbrowser afterwards. **Please make sure to recompile obs-linuxbrowser before opening issues concerning problems with certain CEF versions.***
 
@@ -97,7 +98,8 @@ With a black background, transparency seems to be working out quite fine.
 This issue cannot be fixed.
 
 ## OBS-Linuxbrowser not compiling, complaining about having to use ISO C++11 standard (old compiler versions)
-See [#88](https://github.com/bazukas/obs-linuxbrowser/issues/88) for details. Some older compiler versions seem to have trouble with our current CMake setup. Using newer versions (e.g. GCC 8.x) should work.
+~~See [#88](https://github.com/bazukas/obs-linuxbrowser/issues/88) for details. Some older compiler versions seem to have trouble with our current CMake setup. Using newer versions (e.g. GCC 8.x) should work.~~
+This issue should've been resolved with versions 0.5.3 and above.
 
 ## OBS-Linuxbrowser crashing when using amdgpu
 See [#89](https://github.com/bazukas/obs-linuxbrowser/issues/89) for details. obs-linuxbrowser seems to crash on machines using amdgpu drivers. Unfortunately, this issue cannot be fixed.
