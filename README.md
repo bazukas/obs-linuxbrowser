@@ -18,7 +18,7 @@ terms of browser capabilities.
 
 * Download the latest release from the [releases page](https://github.com/bazukas/obs-linuxbrowser/releases). Make sure the release version matches obs-studio version on your system [1].
 * `mkdir -p $HOME/.config/obs-studio/plugins`
-* Untar, e.g.: `tar -zxvf linuxbrowser0.5.3-obs22.0.2-64bit.tgz -C $HOME/.config/obs-studio/plugins/`
+* Untar, e.g.: `tar -zxvf linuxbrowser0.6.0-obs22.0.2-64bit.tgz -C $HOME/.config/obs-studio/plugins/`
 * Install the dependencies (see Dependencies section)
 
 
@@ -26,7 +26,7 @@ Arch Linux users can install obs-linuxbrowser from the official AUR packages [ob
 
 You don't need to build the plugin if you've downloaded a binary release, instructions below are for people who want to compile the plugin themselves.
 
-[1] Every binary release has the version number of OBS contained as part of the file name, e.g. “linuxbrowser0.5.2-obs22.0.2-64bit.tgz” refers to obs-linuxbrowser version 0.5.3 with OBS version 22.0.2.
+[1] Every binary release has the version number of OBS contained as part of the file name, e.g. “linuxbrowser0.6.0-obs22.0.2-64bit.tgz” refers to obs-linuxbrowser version 0.6.0 with OBS version 22.0.2.
 
 # Building from source
 
