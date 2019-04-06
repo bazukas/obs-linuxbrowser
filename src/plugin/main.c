@@ -42,6 +42,7 @@ struct browser_data {
 
 	/* internal data */
 	obs_source_t* source;
+	obs_data_t* settings;
 	gs_texture_t* activeTexture;
 	pthread_mutex_t textureLock;
 	browser_manager_t* manager;
@@ -160,6 +161,7 @@ static void* browser_create(obs_data_t* settings, obs_source_t* source)
 {
 	struct browser_data* data = bzalloc(sizeof(struct browser_data));
 	data->source = source;
+	data->settings = settings;
 	pthread_mutex_init(&data->textureLock, NULL);
 
 	browser_update(data, settings);
@@ -226,6 +228,34 @@ static void reload_on_scene(void* vptr)
 		browser_manager_reload_page(data->manager);
 }
 
+static bool css_file_reset_button_clicked(obs_properties_t* props, obs_property_t* property,
+                                          void* vptr)
+{
+	UNUSED_PARAMETER(props);
+	UNUSED_PARAMETER(property);
+	struct browser_data* data = vptr;
+	obs_data_t* settings = data->settings;
+
+	obs_data_erase(settings, "css_file");
+	browser_update(data, settings);
+
+	return true;
+}
+
+static bool js_file_reset_button_clicked(obs_properties_t* props, obs_property_t* property,
+                                         void* vptr)
+{
+	UNUSED_PARAMETER(props);
+	UNUSED_PARAMETER(property);
+	struct browser_data* data = vptr;
+	obs_data_t* settings = data->settings;
+
+	obs_data_erase(settings, "js_file");
+	browser_update(data, settings);
+
+	return true;
+}
+
 static bool restart_button_clicked(obs_properties_t* props, obs_property_t* property, void* vptr)
 {
 	UNUSED_PARAMETER(props);
@@ -284,8 +314,12 @@ static obs_properties_t* browser_get_properties(void* vptr)
 
 	obs_properties_add_path(props, "css_file", obs_module_text("CustomCSS"), OBS_PATH_FILE,
 	                        "*.css", NULL);
+	obs_properties_add_button(props, "css_file_reset", obs_module_text("CSSFileReset"),
+	                          css_file_reset_button_clicked);
 	obs_properties_add_path(props, "js_file", obs_module_text("CustomJS"), OBS_PATH_FILE,
 	                        "*.js", NULL);
+	obs_properties_add_button(props, "js_file_reset", obs_module_text("JSFileReset"),
+	                          js_file_reset_button_clicked);
 
 	obs_properties_add_path(props, "flash_path", obs_module_text("FlashPath"), OBS_PATH_FILE,
 	                        "*.so", NULL);
