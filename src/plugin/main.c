@@ -104,10 +104,11 @@ static void browser_update(void* vptr, obs_data_t* settings)
 		browser_manager_set_scroll(data->manager, scroll_vertical, scroll_horizontal);
 	}
 
-	/* comparing and saving c-strings is tedious */
 	if (!data->url || strcmp(url, data->url) != 0) {
-		if (data->url)
+		if (data->url) {
 			bfree(data->url);
+			data->url = NULL;
+		}
 		if (is_local) {
 			size_t len = strlen("file://") + strlen(url) + 1;
 			data->url = bzalloc(len);
@@ -118,14 +119,18 @@ static void browser_update(void* vptr, obs_data_t* settings)
 		browser_manager_change_url(data->manager, data->url);
 	}
 	if (!data->css_file || strcmp(css_file, data->css_file) != 0) {
-		if (data->css_file)
+		if (data->css_file) {
 			bfree(data->css_file);
+			data->css_file = NULL;
+		}
 		data->css_file = bstrdup(css_file);
 		browser_manager_change_css_file(data->manager, data->css_file);
 	}
 	if (!data->js_file || strcmp(js_file, data->js_file) != 0) {
-		if (data->js_file)
+		if (data->js_file) {
 			bfree(data->js_file);
+			data->js_file = NULL;
+		}
 		data->js_file = bstrdup(js_file);
 		browser_manager_change_js_file(data->manager, data->js_file);
 	}
@@ -136,8 +141,10 @@ static void browser_update(void* vptr, obs_data_t* settings)
 	if (resize || !data->activeTexture) {
 		if (resize)
 			browser_manager_change_size(data->manager, data->width, data->height);
-		if (data->activeTexture)
+		if (data->activeTexture) {
 			gs_texture_destroy(data->activeTexture);
+			data->activeTexture = NULL;
+		}
 		data->activeTexture =
 		    gs_texture_create(width, height, GS_BGRA, 1, NULL, GS_DYNAMIC);
 	}
@@ -186,15 +193,25 @@ static void browser_destroy(void* vptr)
 		obs_leave_graphics();
 	}
 
-	if (data->manager)
+	if (data->manager) {
 		destroy_browser_manager(data->manager);
+		data->manager = NULL;
+	}
 
 	obs_hotkey_unregister(data->reload_page_key);
 
-	if (data->url)
+	if (data->url) {
 		bfree(data->url);
-	if (data->css_file)
+		data->url = NULL;
+	}
+	if (data->css_file) {
 		bfree(data->css_file);
+		data->css_file = NULL;
+	}
+	if (data->js_file) {
+		bfree(data->js_file);
+		data->js_file = NULL;
+	}
 	bfree(data);
 }
 
