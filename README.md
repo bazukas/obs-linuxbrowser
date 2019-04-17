@@ -79,6 +79,11 @@ All off the following bindings are children of `window.obsstudio`.
 * `pluginVersion` – A string containing the plugin's version
 
 # Known issues
+## OBS snap installation crashing when trying to create a Linuxbrowser object
+**obs-linuxbrowser does not support Snap installations** as these have some known restrictions that make our plugin crash. Please install OBS your distribution's standard way (e.g. via APT, RPM, etc.).
+
+See [#105](https://github.com/bazukas/obs-linuxbrowser/issues/105) for details.
+
 ## Old version of OBS not starting with new version of obs-linuxbrowser installed
 Using obs-linuxbrowser with an older OBS version than the one which has been used for compilation makes OBS break. Compile obs-linuxbrowser with the same OBS version you are going to use for streaming/recording or select a binary release whose OBS version matches the same version as yours. If you've compiled obs-linuxbrowser yourself, recompile it with the older version of OBS.
 
