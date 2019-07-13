@@ -312,8 +312,9 @@ void BrowserApp::OnContextInitialized()
 	CefRefPtr<BrowserClient> client{new BrowserClient(data, css)};
 	this->client = client;
 
-	browser = CefBrowserHost::CreateBrowserSync(
-	    info, client.get(), "https://github.com/bazukas/obs-linuxbrowser/", settings, nullptr);
+	browser = CefBrowserHost::CreateBrowserSync(info, client,
+	                                            "https://github.com/bazukas/obs-linuxbrowser/",
+	                                            settings, nullptr, nullptr);
 	client->SetScroll(browser, 0, 0); // workaround for scroll to bottom bug
 
 	messageThread = std::thread{[this] { this->MessageThreadWorker(); }};
@@ -334,7 +335,7 @@ void BrowserApp::OnContextCreated(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFr
 	                       V8_PROPERTY_ATTRIBUTE_NONE);
 }
 
-bool BrowserApp::OnProcessMessageReceived(CefRefPtr<CefBrowser> browser,
+bool BrowserApp::OnProcessMessageReceived(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame,
                                           CefProcessId source_process,
                                           CefRefPtr<CefProcessMessage> message)
 {
@@ -384,7 +385,7 @@ void BrowserApp::UpdateActiveStateJS(bool active)
 {
 	CefRefPtr<CefProcessMessage> msg{CefProcessMessage::Create("Active")};
 	msg->GetArgumentList()->SetBool(0, active);
-	this->browser->SendProcessMessage(PID_BROWSER, msg);
+	this->browser->GetMainFrame()->SendProcessMessage(PID_BROWSER, msg);
 }
 
 void BrowserApp::UpdateVisibilityStateJS(bool visible)
@@ -392,5 +393,5 @@ void BrowserApp::UpdateVisibilityStateJS(bool visible)
 	CefRefPtr<CefProcessMessage> msg = CefProcessMessage::Create("Visibility");
 	CefRefPtr<CefListValue> args = msg->GetArgumentList();
 	args->SetBool(0, visible);
-	this->browser->SendProcessMessage(PID_BROWSER, msg);
+	this->browser->GetMainFrame()->SendProcessMessage(PID_BROWSER, msg);
 }
