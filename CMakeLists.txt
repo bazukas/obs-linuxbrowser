@@ -54,7 +54,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED true)
 # Ensure a consistent command chain on all systems
 set(CMAKE_CXX_EXTENSIONS false)
 
-include_directories(src ${OBS_INCLUDE_DIR} ${CEF_INCLUDE_DIR})
+include_directories(src ${PROJECT_BUILD_DIR}/src ${OBS_INCLUDE_DIR} ${CEF_INCLUDE_DIR})
 
 set(PLUGIN_SOURCES
     src/plugin/main.c
@@ -75,7 +75,7 @@ set(BROWSER_SUBPROCESS_SOURCES
 
 configure_file(
     ${PROJECT_SOURCE_DIR}/src/config.h.in
-    ${PROJECT_SOURCE_DIR}/src/config.h
+    ${PROJECT_BINARY_DIR}/src/config.h
 )
 
 add_library(obs-linuxbrowser MODULE ${PLUGIN_SOURCES})
