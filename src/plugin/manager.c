@@ -43,7 +43,7 @@ char* get_shm_name(const char* uid)
 
 /* remove an optional set of matching quotes (single or double),
  * from the beginning and end of a string */
-char* unquote(char* val)
+static char* remove_matching_quotes(char* val)
 {
 	size_t len = strlen(val);
 	if (len < 2)
@@ -120,7 +120,7 @@ static void spawn_renderer(browser_manager_t* manager)
 			char* env_name = strtok(entry, "=");
 			char* env_val = strtok(NULL, "");
 			if (env_name && env_val) {
-				env_val = unquote(env_val);
+				env_val = remove_matching_quotes(env_val);
 				setenv(env_name, env_val, 1);
 			}
 			bfree(entry);
