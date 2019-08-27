@@ -342,6 +342,9 @@ static obs_properties_t* browser_get_properties(void* vptr)
 	                        "*.so", NULL);
 	obs_properties_add_text(props, "flash_version", obs_module_text("FlashVersion"),
 	                        OBS_TEXT_DEFAULT);
+	obs_properties_add_editable_list(props, "cef_environment",
+	                                 obs_module_text("EnvironmentVariables"),
+	                                 OBS_EDITABLE_LIST_TYPE_STRINGS, NULL, NULL);
 	obs_properties_add_editable_list(props, "cef_command_line",
 	                                 obs_module_text("CommandLineArguments"),
 	                                 OBS_EDITABLE_LIST_TYPE_STRINGS, NULL, NULL);

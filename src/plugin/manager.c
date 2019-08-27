@@ -41,6 +41,23 @@ char* get_shm_name(const char* uid)
 	return shm_name;
 }
 
+/* remove an optional set of matching quotes (single or double),
+ * from the beginning and end of a string */
+static char* remove_matching_quotes(char* val)
+{
+	size_t len = strlen(val);
+	if (len < 2)
+		return val;
+
+	char first = val[0];
+	char last = val[len - 1];
+	if (first != last || !strchr("'\"", first))
+		return val;
+
+	val[len - 1] = '\0';
+	return val + 1;
+}
+
 /* mostly building strings for arguments and env variables for
  * browser process */
 static void spawn_renderer(browser_manager_t* manager)
@@ -70,6 +87,9 @@ static void spawn_renderer(browser_manager_t* manager)
 
 	char* data_path = (char*) obs_get_module_data_path(obs_current_module());
 
+	obs_data_array_t* env_vars = obs_data_get_array(manager->settings, "cef_environment");
+	size_t env_num = obs_data_array_count(env_vars);
+
 	obs_data_array_t* command_lines = obs_data_get_array(manager->settings, "cef_command_line");
 	size_t arg_num = 6 + obs_data_array_count(command_lines);
 
@@ -92,6 +112,20 @@ static void spawn_renderer(browser_manager_t* manager)
 	manager->pid = fork();
 	if (manager->pid == 0) {
 		setenv("LD_LIBRARY_PATH", bin_dir, 1);
+		for (int i = 0; i < env_num; ++i) {
+			obs_data_t* item = obs_data_array_item(env_vars, i);
+			const char* value = obs_data_get_string(item, "value");
+			char* entry = bstrdup(value);
+			/* split entry "env_name=env_val" */
+			char* env_name = strtok(entry, "=");
+			char* env_val = strtok(NULL, "");
+			if (env_name && env_val) {
+				env_val = remove_matching_quotes(env_val);
+				setenv(env_name, env_val, 1);
+			}
+			bfree(entry);
+			obs_data_release(item);
+		}
 		execv(renderer, argv);
 	}
 
