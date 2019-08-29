@@ -54,7 +54,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED true)
 # Ensure a consistent command chain on all systems
 set(CMAKE_CXX_EXTENSIONS false)
 
-include_directories(src ${PROJECT_BUILD_DIR}/src ${OBS_INCLUDE_DIR} ${CEF_INCLUDE_DIR})
+include_directories(src ${PROJECT_BINARY_DIR}/src ${OBS_INCLUDE_DIR} ${CEF_INCLUDE_DIR})
 
 set(PLUGIN_SOURCES
     src/plugin/main.c
