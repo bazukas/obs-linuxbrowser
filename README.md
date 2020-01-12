@@ -79,6 +79,9 @@ All off the following bindings are children of `window.obsstudio`.
 * `pluginVersion` – A string containing the plugin's version
 
 # Known issues
+## obs-linuxbrowser does not compile with recent versions of CEF
+Due to changes of the CEF API, recent versions of CEF are no longer compatible with obs-linuxbrowser. An attempt to solve this issue has been made and can be tried out by checking out the `fix-new-cef-api-108-110` branch. Unfortunately, this branch hasn't been merged to `master` yet due to the problems described in [#121](https://github.com/bazukas/obs-linuxbrowser/issues/121).
+
 ## OBS snap installation crashing when trying to create a Linuxbrowser object
 **obs-linuxbrowser does not support Snap installations** as these have some known restrictions that make our plugin crash. Please install OBS your distribution's standard way (e.g. via APT, RPM, etc.).
 
