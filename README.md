@@ -1,3 +1,9 @@
+**Good news!** Starting with version 25, OBS Studio ships with browser source that work on Linux.
+I recommend you to use that and report any issues at [obs-browser repo](https://github.com/obsproject/obs-browser) and/or official discord community.
+
+I will archive this repository from now on. I would like to say big thanks to all the users, testers and contributors.
+Special thanks to [NexAdn](https://github.com/NexAdn) who helped maintain this repository for most of the time!
+
 # About
 
 This is a browser source plugin for [obs-studio](https://github.com/obsproject/obs-studio) based
